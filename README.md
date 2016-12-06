@@ -12,16 +12,16 @@ The length of the recieving buffer must also be given at compiletime.
 ## Interface
 The interface consits of:
 * `init_SPI(baud)`
-   initialises SPI, configuring clock and SPI interface. The baudrate is given and mached as good as possible using the prescalars available in the hardware.
+    initialises SPI, configuring clock and SPI interface. The baudrate is given and mached as good as possible using the prescalars available in the hardware.
 * `write_SPI( data )`
-   writes the data given as argument into a packet in the send buffer.
+    writes the data given as argument into a packet in the send buffer.
 * `read_SPI()`
-   reads the next packet from the input buffer and returns it.
+    reads the next packet from the input buffer and returns it.
 
 The Library needs some information at compiletime:
 * `PACKETLENGTH`
-   length of a packet
+    length of a packet
 * `TRANSMITBUFFERLENGTH`
-   Number of packets in the send buffer
+    Number of packets in the send buffer
 * `RECIEVEBUFFERLENGTH`
-   Number of packets in the recieve buffer
+    Number of packets in the recieve buffer
