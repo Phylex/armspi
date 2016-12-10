@@ -11,13 +11,18 @@ The length of the recieving buffer must also be given at compiletime.
 
 The State of the buffer is captured and displayed for all involved functions through a status register that is named `spi_status` it is only altered by the functions within the library, but for sake of completeness I thought to mentione it here.
 
-The mode of the software (master/slave) is set by defining `MASTER` if the device should run as master and `SLAVE` if the device should run as slave.
+## Data Structures
+The main data Structure is the Packet struct. It consists of an array, that has the length `PACKETLENGTH`, measured in bytes, and a `uint8_t` that denotes the size. the Size 0 denotes that packet is empty.
+Derived from the packet data structure is are the two ringbuffer that store the incoming and outgoing packets, until transmission or retrecval or overwrite. The Funktions `write_SPI` and `read_SPI` access those buffers
+
+The user has to (because of the fact that the ringbuffer structs should be declared globally) declare as many spi structs as he has SPI modules. the structure then has to be passed to the 
 
 ## Interface
 The interface consits of:
 * `init_SPI(baud)`
 
     initialises SPI, configuring clock and SPI interface. The baudrate is given and mached as good as possible using the prescalars available in the hardware.
+    To calculate the speed at wich the Clock of the SPI has to be set to nearest mach the bauderate given it will read the setting from the RCC unit
 
 * `write_SPI(data)`
 
@@ -26,6 +31,10 @@ The interface consits of:
 * `read_SPI()`
 
     reads the next packet from the input buffer and returns it.
+
+* `set_SPI_mode(mode)`
+
+    This sets the Mode of the SPI-device into master or slave mode. The corresponding define is `MASTER` and `SLAVE` and these are defined in armspi.h
 
 The Library needs some information at compiletime:
 * `PACKETLENGTH`
@@ -40,8 +49,9 @@ The Library needs some information at compiletime:
 
     Number of packets in the recieve buffer
 
-## Data Structures
-The main data Structure is the Packet struct. It consists of an array, that has the length `PACKETLENGTH`, measured in bytes, and a `uint8_t` that denotes the size. the Size 0 denotes that packet is empty.
+* `DEVICE_AMOUNT`
+
+    The amount of SPI interfaces that are to be used with the library.
 
 ## Iterrupt handling
 The data and is mostly hadeled within the interrupt routine. This checks the state of the packet in the status register and then manipulates the data accordingly, eighther sending the next byte of data,
