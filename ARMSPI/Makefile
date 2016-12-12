@@ -1,7 +1,7 @@
 TOPDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 TARGET=DSTM32F1
-OBJ = main.o spi.o
+OBJ = spi.o
 
 CROSS_PREFIX ?= arm-none-eabi-
 CC=$(CROSS_PREFIX)gcc
@@ -31,5 +31,8 @@ clean:
 
 debug:
 	arm-none-eabi-gdb  -ex 'target extended-remote :3333' armspi.elf
+
+preproc:
+	$(CC) $(CFLAGS) -E testscript.c
 
 .PHONY: all flash clean debug
