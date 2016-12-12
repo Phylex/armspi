@@ -15,7 +15,7 @@ The State of the buffer is captured and displayed for all involved functions thr
 The main data Structure is the Packet struct. It consists of an array, that has the length `PACKETLENGTH`, measured in bytes, and a `uint8_t` that denotes the size. the Size 0 denotes that packet is empty.
 Derived from the packet data structure is are the two ringbuffer that store the incoming and outgoing packets, until transmission or retrecval or overwrite. The Funktions `write_SPI` and `read_SPI` access those buffers
 
-The user has to (because of the fact that the ringbuffer structs should be declared globally) declare as many spi structs as he has SPI modules. the structure then has to be passed to the 
+The user has to (because of the fact that the ringbuffer structs should be declared globally) declare as many spi structs as he has SPI modules. the structure then has to be passed to the
 
 ## Interface
 The interface consits of:
@@ -53,8 +53,33 @@ The Library needs some information at compiletime:
 
     The amount of SPI interfaces that are to be used with the library.
 
+* `SPI_MODULE_0`, `SPI_MODULE_1`, `SPI_MODULE_2`, `SPI_MODULE_3`, `SPI_MODULE_4`, `SPI_MODULE_5`, `SPI_MODULE_6`
+
+    The Module that should be activated has to be defined, therefor the the Module name has to be uncommented in armspi.h
+
 ## Iterrupt handling
 The data and is mostly hadeled within the interrupt routine. This checks the state of the packet in the status register and then manipulates the data accordingly, eighther sending the next byte of data,
 selecting the next paket for sending or shutting down the clock because the buffer is empty.
 
+## Indices and general I/O procedures
+The software is esentially a piece of data management software put ontop of a hardware interface. For the routines used to access the data I chose the scheme:
+* Check/Redirect
 
+    check if the data at the index is within range of the different data structures and/or allowed ranges and if the IO operation has reached a boundary, redirect it to the proper place in the data structures or terminate the I/O operation
+
+* Read/Write
+
+    Read/Write the output/input into the data structures, if the checks returned with the goahead
+
+* Increment
+
+   Now we simply increment the counter/pointer and terminate the I/O operation
+
+Because of the Structure of a Ringbuffer, there are a few cases where design decisions have to be made.
+* `HEAD` catches up with `TAIL`:
+
+   when this happenes, the position of the `TAIL` is rotated further by one position, the freed packet is overwritten in the process.
+
+* Meaning of the `HEAD` pointer:
+
+   The head pointer points to the packet, that is written to by the hardware. This means, that the first readable packet is `HEAD-1`. If the `TAIL` is at the same position as Head the tail returns a 0 and sets the BUFFER_EMPTY Flag
