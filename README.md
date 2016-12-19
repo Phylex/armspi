@@ -63,22 +63,19 @@ selecting the next paket for sending or shutting down the clock because the buff
 
 ## Indices and general I/O procedures
 The software is esentially a piece of data management software put ontop of a hardware interface. For the routines used to access the data I chose the scheme:
-* Check/Redirect
-
-    check if the data at the index is within range of the different data structures and/or allowed ranges and if the IO operation has reached a boundary, redirect it to the proper place in the data structures or terminate the I/O operation
-
 * Read/Write
 
     Read/Write the output/input into the data structures, if the checks returned with the goahead
 
-* Increment
+* Check
 
-   Now we simply increment the counter/pointer and terminate the I/O operation
+    We check if the position, that we want to increment the pointer to is valid, if so we can increment the pointer, if not, we set appropriate flags.
 
 Because of the Structure of a Ringbuffer, there are a few cases where design decisions have to be made.
 * `HEAD` catches up with `TAIL`:
 
    when this happenes, the position of the `TAIL` is rotated further by one position, the freed packet is overwritten in the process.
+   If `HEAD` and `TAIlL` are at the same position the buffer empty flag is set.
 
 * Meaning of the `HEAD` pointer:
 
