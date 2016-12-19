@@ -173,44 +173,102 @@ void init_spi(uint8_t mode, uint8_t spi_module){
 	}
 }
 
-// TODO rework this after deciding on a good deesign sheme
-uint8_t spi_irq_txdata_handler(struct spi *spimodule){
-	// the Send part
-	// first we perform the Check and redirect stuff
-	if(spimodule.txbuffer.tail.sendbyte >= spimodule.txbuffer.tail.plength){
-		// here the current packet is empty and we assume we have sent the entire packet and swich
-		spimodule.txbuffer.tail.sendbyte = 0;
-		spimodule.txbuffer.tail.plength = 0;
-		// now we check if the buffer is empty
-		if(spimodule.txbuffer.tail + 1 >= spimodule.txbuffer.start + spimodule.txbuffer.buffersize){
-			if(spimodule.txbuffer.head == spimodule.txbuffer.start){
-				spimodule.status |= SPIBUFFER_EMPTY;
-				return 0;
-			}
-			else{
-				spimodule.txbuffer.tail = spimodule.txbuffer.start;
-			}
-		}
-		else{
-			if(spimodule.txbuffer.head == spimodule.txbuffer.start){
-				spimodule.status |= SPIBUFFER_EMPTY;
-				return 0;
-			}
-			else{
-				spimodule.txbuffer.tail ++;
-			}
-		}
-		return spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.sendbyte];
+// helper funktions -----------------------------------------------------------
+void set_SS_pin_high(){
+// TODO still need to implement
+}
+
+void set_SS_pin_low(){
+// TODO still need to implement
+}
+
+// the first byte of the 16Bit is the "flag-register"
+uint16_t get_next_byte_from_packet(struct packet packet){
+	uint8_t status = 0;
+	if(packet.sendbyte >= packet.plength){
+		packet.sendbyte = 0;
+		packet.plength = 0;
+		status  |= SPI_SENDING_PACKET;
+		return 0 | (status<<8);
 	}
 	else{
-		// we are stil sending the same packet and have mot reached its end yet, so we continue sending
-		returnbyte = spimodule.txbuffer.tail.content[ spimodule.txbuffer.tail.sendbyte ];
-		spimodule.txbuffer.tail.sendbyte ++;
+		uint8_t returnbyte;
+		returnbyte = packet.contents[packet.sendbyte]
+		sendbyte ++;
 		return returnbyte;
 	}
 }
 
-void spi_irq_rxdata_handler(struct spi *spimodule, uint8_t data){
-	if()
+// the returned byte is the status of the operation
+uint8_t write_byte_into_packet(struct packet *packet, uint8_t data){
+	uint8_t status = 0;
+	if(packet.plength >= PACKETLENGTH){
+		status |= RX_PACKET_FULL;
+		return status;
+	}
+	else{
+		packet.contents[packet.plength] = data;
+		return status;
+	}
+}
+
+void increment_bufferpointer(struct packet *pointer, struct ringbuffer *buffer){
+	pointer ++;
+	if(pointer >= buffer.start+buffersize){
+		pointer = buffer.start;
+	}
+}
+
+// end helper functions -------------------------------------------------------
+
+
+// the first byte of the 16Bit is the "flag-register"
+uint16_t spi_irq_master_handler(struct spi *spimodule, uint32_t spi, uint32_t pin){
+	rxdata = spi_read(spi);
+	spimodule.rxbuffer.head.contents[spimodule.rxbuffer.head.plength] = uint8_t(rxdata);
+	spimodule.rxbuffer.head.plength++;
+	if(spimodule.status & SPI_PACKET_BEING_SENT){
+		spi_write(spi, uint16_t(spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.sendbyte]));
+		spimodule.txbuffer.tail.sendbyte++;
+		if(spimodule.txbuffer.tail.sendbyte < spimodule.txbuffer.tail.plength){
+			return 0;
+		}
+		else{
+			spimodule.status &= ~SPI_PACKET_BEING_SENT;
+			spimodule.txbuffer.tail.plength = 0;
+			spimodule.txbuffer.tail.sendbyte = 0;
+			return 0;
+		}
+	}
+	else{
+		set_SS_pin_high(pin);
+		increment_bufferpointer(spimodule.rxbuffer.head, spimodule.rxbuffer);
+		increment_bufferpointer(spimodule.txbuffer.tail, spimodule.txbuffer);
+		if(spimodule.rxbuffer.head == spimodule.rxbuffer.tail){
+			spimodule.rxbuffer.tail.plength = 0;
+			spimodule.rxbuffer.tail.sendbyte = 0;
+			increment_bufferpointer(spimodule.rxbuffer.tail, spimodule.rxbuffer);
+		}
+		if(spimodule.txbuffer.tail == spimodule.txbuffer.head){
+			spimodule.status |= SPIBUFFER_EMPTY;
+		}
+		else{
+			set_SS_pin_low(pin);
+			if(spimodule.txbuffer.tail.plength > 1){
+				spimodule.status |= SPI_PACKET_BEING_SENT;
+			}
+			spi_write(spi, spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.sendbyte]);
+			return 0;
+		}
+	}
+}
+
+uint16_t spi_irq_rxdata_handler(struct ringbuffer *rxbuffer, uint8_t data){
+	status = write_byte_into_packet(data, rxbuffer.head);
+	if(status != 0){
+		if(status & RX_PACKET_FULL){
+			
+		}
+	}
 }
 
