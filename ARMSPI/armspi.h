@@ -10,7 +10,7 @@
 //the defines for the bits in the spi struct status byte
 #define SPIBUFFER_EMPTY		(1<<7)
 #define SPIBUFFER_FULL		(1<<6)
-
+#define SPI_PACKET_BEING_SENT	(1<<5)
 
 #define PACKETLENGTH = 4
 #define TRANSMITBUFFERLENGTH = 4
