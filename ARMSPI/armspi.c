@@ -16,8 +16,8 @@
 
 struct packet {
 	uint8_t contents[PACKETLENGTH];
-	uint8_t plength;
-	uint8_t sendbyte;
+	uint8_t writeindex;
+	uint8_t readindex;
 };
 
 struct ringbuffer {
@@ -185,16 +185,16 @@ void set_SS_pin_low(){
 // the first byte of the 16Bit is the "flag-register"
 uint16_t get_next_byte_from_packet(struct packet packet){
 	uint8_t status = 0;
-	if(packet.sendbyte >= packet.plength){
-		packet.sendbyte = 0;
-		packet.plength = 0;
+	if(packet.readindex >= packet.writeindex){
+		packet.readindex = 0;
+		packet.writeindex = 0;
 		status  |= SPI_SENDING_PACKET;
 		return 0 | (status<<8);
 	}
 	else{
 		uint8_t returnbyte;
-		returnbyte = packet.contents[packet.sendbyte]
-		sendbyte ++;
+		returnbyte = packet.contents[packet.readindex]
+		readindex ++;
 		return returnbyte;
 	}
 }
@@ -202,12 +202,12 @@ uint16_t get_next_byte_from_packet(struct packet packet){
 // the returned byte is the status of the operation
 uint8_t write_byte_into_packet(struct packet *packet, uint8_t data){
 	uint8_t status = 0;
-	if(packet.plength >= PACKETLENGTH){
+	if(packet.writeindex >= PACKETLENGTH){
 		status |= RX_PACKET_FULL;
 		return status;
 	}
 	else{
-		packet.contents[packet.plength] = data;
+		packet.contents[packet.writeindex] = data;
 		return status;
 	}
 }
@@ -225,18 +225,18 @@ void increment_bufferpointer(struct packet *pointer, struct ringbuffer *buffer){
 // the first byte of the 16Bit is the "flag-register"
 uint16_t spi_irq_master_handler(struct spi *spimodule, uint32_t spi, uint32_t pin){
 	rxdata = spi_read(spi);
-	spimodule.rxbuffer.head.contents[spimodule.rxbuffer.head.plength] = uint8_t(rxdata);
-	spimodule.rxbuffer.head.plength++;
+	spimodule.rxbuffer.head.contents[spimodule.rxbuffer.head.writeindex] = uint8_t(rxdata);
+	spimodule.rxbuffer.head.writeindex++;
 	if(spimodule.status & SPI_PACKET_BEING_SENT){
-		spi_write(spi, uint16_t(spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.sendbyte]));
-		spimodule.txbuffer.tail.sendbyte++;
-		if(spimodule.txbuffer.tail.sendbyte < spimodule.txbuffer.tail.plength){
+		spi_write(spi, uint16_t(spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.readindex]));
+		spimodule.txbuffer.tail.readindex++;
+		if(spimodule.txbuffer.tail.readindex < spimodule.txbuffer.tail.writeindex){
 			return 0;
 		}
 		else{
 			spimodule.status &= ~SPI_PACKET_BEING_SENT;
-			spimodule.txbuffer.tail.plength = 0;
-			spimodule.txbuffer.tail.sendbyte = 0;
+			spimodule.txbuffer.tail.writeindex = 0;
+			spimodule.txbuffer.tail.readindex = 0;
 			return 0;
 		}
 	}
@@ -245,19 +245,21 @@ uint16_t spi_irq_master_handler(struct spi *spimodule, uint32_t spi, uint32_t pi
 		increment_bufferpointer(spimodule.rxbuffer.head, spimodule.rxbuffer);
 		increment_bufferpointer(spimodule.txbuffer.tail, spimodule.txbuffer);
 		if(spimodule.rxbuffer.head == spimodule.rxbuffer.tail){
-			spimodule.rxbuffer.tail.plength = 0;
-			spimodule.rxbuffer.tail.sendbyte = 0;
+			spimodule.rxbuffer.tail.writeindex = 0;
+			spimodule.rxbuffer.tail.readindex = 0;
 			increment_bufferpointer(spimodule.rxbuffer.tail, spimodule.rxbuffer);
+			spimodule.rxbuffer.tail.writeindex = 0;
+			spimodule.rxbuffer.tail.readindex = 0;
 		}
 		if(spimodule.txbuffer.tail == spimodule.txbuffer.head){
 			spimodule.status |= SPIBUFFER_EMPTY;
 		}
 		else{
 			set_SS_pin_low(pin);
-			if(spimodule.txbuffer.tail.plength > 1){
+			if(spimodule.txbuffer.tail.writeindex > 1){
 				spimodule.status |= SPI_PACKET_BEING_SENT;
 			}
-			spi_write(spi, spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.sendbyte]);
+			spi_write(spi, spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.readindex]);
 			return 0;
 		}
 	}
