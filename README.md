@@ -9,22 +9,25 @@ The Buffer is implemented as a ringbuffer, the size of wich must be given at com
 The recieving side is implemented as a LIFO buffer (ringbuffer), that overwrites the still unread packets if it is full, by incrementing the readout pointer to be at least the write pointer.
 The length of the recieving buffer must also be given at compiletime.
 
-The State of the buffer is captured and displayed for all involved functions through a status register that is named `spi_status` it is only altered by the functions within the library, but for sake of completeness I thought to mentione it here.
+The State of the buffer is captured and displayed for all involved functions through a status register that is named `spi_status` it is only altered by the functions within the library, but for sake of completeness I thought I should mentione it here.
 
 ## Data Structures
-The main data Structure is the Packet struct. It consists of an array, that has the length `PACKETLENGTH`, measured in bytes, and a `uint8_t` that denotes the size. the Size 0 denotes that packet is empty.
-Derived from the packet data structure is are the two ringbuffer that store the incoming and outgoing packets, until transmission or retrecval or overwrite. The Funktions `write_SPI` and `read_SPI` access those buffers
-
-The user has to (because of the fact that the ringbuffer structs should be declared globally) declare as many spi structs as he has SPI modules. the structure then has to be passed to the
+The data structure consists of Packets, the size of which can be determined py `PACKETLENGTH`.
+These are then organized into a Ringbuffer.
+The leading Pointer of the Ringbuffer is the `HEAD` and the trailing one is the `TAIL`.
+Two ringbuffer are then combined to make a spi-module.
+The Spi-Module also incorporates a Status byte and the connected slaves.
+The Pins that the slaves are connected to are given another struct called PIN. It consists of a pointer to the Memory mapped address of the port plus the pin number within that port.
+The Data for the address of the pins and ports is taken from the headers provided by the libopencm3 Project.
 
 ## Interface
 The interface consits of:
-* `init_SPI(baud)`
+* `init_SPI()`
 
     initialises SPI, configuring clock and SPI interface. The baudrate is given and mached as good as possible using the prescalars available in the hardware.
     To calculate the speed at wich the Clock of the SPI has to be set to nearest mach the bauderate given it will read the setting from the RCC unit
 
-* `write_SPI(data)`
+* `write_SPI(*data, size)`
 
     writes the data given as argument into a packet in the send buffer.
 
@@ -32,9 +35,9 @@ The interface consits of:
 
     reads the next packet from the input buffer and returns it.
 
-* `set_SPI_mode(mode)`
+* `set_SPI_mode(spi_module, mode)`
 
-    This sets the Mode of the SPI-device into master or slave mode. The corresponding define is `MASTER` and `SLAVE` and these are defined in armspi.h
+    This sets the Mode of the SPI-device into master or slave mode. When this is done the current packet in the recieve and send buffers are dropped and the buffers are rotated to the next packet.
 
 The Library needs some information at compiletime:
 * `PACKETLENGTH`
@@ -49,27 +52,27 @@ The Library needs some information at compiletime:
 
     Number of packets in the recieve buffer
 
-* `DEVICE_AMOUNT`
 
-    The amount of SPI interfaces that are to be used with the library.
-
-* `SPI_MODULE_0`, `SPI_MODULE_1`, `SPI_MODULE_2`, `SPI_MODULE_3`, `SPI_MODULE_4`, `SPI_MODULE_5`, `SPI_MODULE_6`
+* `SPI_MODULE_0`, `SPI_MODULE_1`, `SPI_MODULE_2`, `SPI_MODULE_3`, `SPI_MODULE_4`, `SPI_MODULE_5`
 
     The Module that should be activated has to be defined, therefor the the Module name has to be uncommented in armspi.h
+    The Module name here corresponds to the hardware interface of the number (modulenumber +1).
+    It includes the default pins for that device as defined in the libopencm3 for that device.
+    The pins for the SS lines connected to the
 
 ## Iterrupt handling
 The data and is mostly hadeled within the interrupt routine. This checks the state of the packet in the status register and then manipulates the data accordingly, eighther sending the next byte of data,
 selecting the next paket for sending or shutting down the clock because the buffer is empty.
 
 ## Indices and general I/O procedures
-The software is esentially a piece of data management software put ontop of a hardware interface. For the routines used to access the data I chose the scheme:
+The software is esentially a piece of data management software put ontop of a hardware interface. For the routines used to access the data I chose the scheme that consists of the following elements:
+* Check
+
+    We check if the position, that the pointer is pointing to is valid, if so we can go to the next step, if not, we set appropriate flags.
+
 * Read/Write
 
     Read/Write the output/input into the data structures, if the checks returned with the goahead
-
-* Check
-
-    We check if the position, that we want to increment the pointer to is valid, if so we can increment the pointer, if not, we set appropriate flags.
 
 Because of the Structure of a Ringbuffer, there are a few cases where design decisions have to be made.
 * `HEAD` catches up with `TAIL`:
@@ -77,6 +80,6 @@ Because of the Structure of a Ringbuffer, there are a few cases where design dec
    when this happenes, the position of the `TAIL` is rotated further by one position, the freed packet is overwritten in the process.
    If `HEAD` and `TAIlL` are at the same position the buffer empty flag is set.
 
-* Meaning of the `HEAD` pointer:
+* Interpretation of the `HEAD` pointer:
 
    The head pointer points to the packet, that is written to by the hardware. This means, that the first readable packet is `HEAD-1`. If the `TAIL` is at the same position as Head the tail returns a 0 and sets the BUFFER_EMPTY Flag
