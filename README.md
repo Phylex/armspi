@@ -52,13 +52,18 @@ The Library needs some information at compiletime:
 
     Number of packets in the recieve buffer
 
-
 * `SPI_MODULE_0`, `SPI_MODULE_1`, `SPI_MODULE_2`, `SPI_MODULE_3`, `SPI_MODULE_4`, `SPI_MODULE_5`
 
     The Module that should be activated has to be defined, therefor the the Module name has to be uncommented in armspi.h
     The Module name here corresponds to the hardware interface of the number (modulenumber +1).
     It includes the default pins for that device as defined in the libopencm3 for that device.
-    The pins for the SS lines connected to the
+
+## The handling of Slaves
+This library is generally capable of handling multiple Slaves. Therefore the SSM on the STM's is enabled. To enable a second slave, define the port and pin and in the header everything else should be done at compiletime. every other port and pin definition schould be commented out.
+If using more than 5 Slaves, one has to edit the armspi.c file and add another line in the initialisations of the `connected_slaves_(modulenumber)` in the same manner the others have been added.
+The naming convention should be fairly obvious and I recomment do follow it.
+The Naming convention is as follows:
+In `SPI_N_SLAVE_M_[PORT/PIN]` the N denotes the number of the Module and the M denotes the number of the Slave connected.
 
 ## Iterrupt handling
 The data and is mostly hadeled within the interrupt routine. This checks the state of the packet in the status register and then manipulates the data accordingly, eighther sending the next byte of data,
