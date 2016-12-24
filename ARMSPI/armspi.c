@@ -39,7 +39,7 @@ struct spi {
 // and initialize the data structures
 
 #ifdef SPI_MODULE_0
-struct spi *spi_module_0 = malloc(sizeof(struct spi));
+volatile struct spi *spi_module_0 = malloc(sizeof(struct spi));
 // transmit buffer initialization
 spi_module_0.txbuffer.start = spi_module_0.tbuffer;
 spi_module_0.txbuffer.head = spi_module_0.tbuffer;
@@ -53,7 +53,7 @@ spi_module_0.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
 #endif
 
 #ifdef SPI_MODULE_1
-struct spi *spi_module_1 = malloc(sizeof(struct spi));
+volatile struct spi *spi_module_1 = malloc(sizeof(struct spi));
 // transmit buffer initialization
 spi_module_1.txbuffer.start = spi_module_1.tbuffer;
 spi_module_1.txbuffer.head = spi_module_1.tbuffer;
@@ -67,7 +67,7 @@ spi_module_1.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
 #endif
 
 #ifdef SPI_MODULE_2
-struct spi *spi_module_2 = malloc(sizeof(struct spi));
+volatile struct spi *spi_module_2 = malloc(sizeof(struct spi));
 // transmit buffer initialization
 spi_module_2.txbuffer.start = spi_module_2.tbuffer;
 spi_module_2.txbuffer.head = spi_module_2.tbuffer;
@@ -82,7 +82,7 @@ spi_module_2.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
 
 #ifdef SPI_MODULE_3
 // transmit buffer initialization
-struct spi *spi_module_3 = malloc(sizeof(struct spi));
+volatile struct spi *spi_module_3 = malloc(sizeof(struct spi));
 spi_module_3.txbuffer.start = spi_module_3.tbuffer;
 spi_module_3.txbuffer.head = spi_module_3.tbuffer;
 spi_module_3.txbuffer.tail = spi_module_3.tbuffer;
@@ -95,7 +95,7 @@ spi_module_3.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
 #endif
 
 #ifdef SPI_MODULE_4
-struct spi *spi_module_4 = malloc(sizeof(struct spi));
+volatile struct spi *spi_module_4 = malloc(sizeof(struct spi));
 // transmit buffer initialization
 spi_module_4.txbuffer.start = spi_module_4.tbuffer;
 spi_module_4.txbuffer.head = spi_module_4.tbuffer;
@@ -109,7 +109,7 @@ spi_module_4.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
 #endif
 
 #ifdef SPI_MODULE_5
-struct spi *spi_module_5 = malloc(sizeof(struct spi));
+volatile struct spi *spi_module_5 = malloc(sizeof(struct spi));
 // transmit buffer initialization
 spi_module_5.txbuffer.start = spi_module_5.tbuffer;
 spi_module_5.txbuffer.head = spi_module_5.tbuffer;
@@ -151,7 +151,7 @@ void init_spi(uint8_t mode, uint8_t spi_module){
 		spi_init_master(SPI4, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
 				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
 		spi_enable_tx_buffer_empty(SPI4);
-		spi_enable(SPI3);
+		spi_enable(SPI4);
 		#endif
 
 		#ifdef SPI_MODULE_4
@@ -170,6 +170,8 @@ void init_spi(uint8_t mode, uint8_t spi_module){
 	}
 	else if(mode == SPI_SLAVE){
 		// TODO follow the procedure on page 697 of the manual
+	#ifdef SPI_MODULE_0
+
 	}
 }
 
@@ -182,35 +184,6 @@ void set_SS_pin_low(){
 // TODO still need to implement
 }
 
-// the first byte of the 16Bit is the "flag-register"
-uint16_t get_next_byte_from_packet(struct packet packet){
-	uint8_t status = 0;
-	if(packet.readindex >= packet.writeindex){
-		packet.readindex = 0;
-		packet.writeindex = 0;
-		status  |= SPI_SENDING_PACKET;
-		return 0 | (status<<8);
-	}
-	else{
-		uint8_t returnbyte;
-		returnbyte = packet.contents[packet.readindex]
-		readindex ++;
-		return returnbyte;
-	}
-}
-
-// the returned byte is the status of the operation
-uint8_t write_byte_into_packet(struct packet *packet, uint8_t data){
-	uint8_t status = 0;
-	if(packet.writeindex >= PACKETLENGTH){
-		status |= RX_PACKET_FULL;
-		return status;
-	}
-	else{
-		packet.contents[packet.writeindex] = data;
-		return status;
-	}
-}
 
 void increment_bufferpointer(struct packet *pointer, struct ringbuffer *buffer){
 	pointer ++;
@@ -265,12 +238,69 @@ uint16_t spi_irq_master_handler(struct spi *spimodule, uint32_t spi, uint32_t pi
 	}
 }
 
-uint16_t spi_irq_rxdata_handler(struct ringbuffer *rxbuffer, uint8_t data){
-	status = write_byte_into_packet(data, rxbuffer.head);
-	if(status != 0){
-		if(status & RX_PACKET_FULL){
-			
-		}
+uint16_t spi_irq_rxdata_handler(struct spi *spimodule, uint8_t data, uint32_t spi){
+	uint8_t tmprxdata = spi_read(spi);
+	for(uint8_t i=0; i>=MAXLOOP; i++){
+		if()
 	}
 }
 
+#ifdef SPI_MODULE_0
+void spi1_isr(void){
+	if(spi_module_0.status & SPI_MASTER){
+		spi_irq_master_handler(spi_module_0);
+	}
+	else{
+		spi_irq_slave_handler(spi_module_0);
+	}
+}
+
+#ifdef SPI_MODULE_1
+void spi2_isr(void){
+	if(spi_module_1.status & SPI_MASTER){
+		spi_irq_master_handler(spi_module_1);
+	}
+	else{
+		spi_irq_slave_handler(spi_module_1);
+	}
+}
+
+#ifdef SPI_MODULE_2
+void spi3_isr(void){
+	if(spi_module_2.status & SPI_MASTER){
+		spi_irq_master_handler(spi_module_2);
+	}
+	else{
+		spi_irq_slave_handler(spi_module_2);
+	}
+}
+
+#ifdef SPI_MODULE_3
+void spi4_isr(void){
+	if(spi_module_3.status & SPI_MASTER){
+		spi_irq_master_handler(spi_module_3);
+	}
+	else{
+		spi_irq_slave_handler(spi_module_3);
+	}
+}
+
+#ifdef SPI_MODULE_4
+void spi5_isr(void){
+	if(spi_module_4.status & SPI_MASTER){
+		spi_irq_master_handler(spi_module_4);
+	}
+	else{
+		spi_irq_slave_handler(spi_module_4);
+	}
+}
+
+#ifdef SPI_MODULE_5
+void spi6_isr(void){
+	if(spi_module_5.status & SPI_MASTER){
+		spi_irq_master_handler(spi_module_5);
+	}
+	else{
+		spi_irq_slave_handler(spi_module_5);
+	}
+}
