@@ -10,8 +10,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
-#include <libopencm3/stm32/nvic.h>
-#include <stdlib.h>
+#include <libopencm3/cm3/nvic.h>
 
 //the defines for the bits in the spi struct status byte
 #define SPIBUFFER_EMPTY		(1<<7)
@@ -19,9 +18,9 @@
 #define SPI_PACKET_BEING_SENT	(1<<5)
 #define SPI_MASTER		(1<<4)
 
-#define PACKETLENGTH = 4
-#define TRANSMITBUFFERLENGTH = 4
-#define RECIEVEBUFFERLENGHT = 4
+#define PACKETLENGTH 4
+#define TRANSMITBUFFERLENGTH 4
+#define RECIEVEBUFFERLENGHT 4
 
 //Uncomment, to activate the module
 // #define SPI_MODULE_0
@@ -31,7 +30,7 @@
 // #define SPI_MODULE_4
 // #define SPI_MODULE_5
 
-// Now we define how many slaves are connected to the 
+// Now we define how many slaves are connected to the
 #define SPI_0_CONNECTED_SLAVES 1
 #define SPI_1_CONNECTED_SLAVES 1
 #define SPI_2_CONNECTED_SLAVES 1

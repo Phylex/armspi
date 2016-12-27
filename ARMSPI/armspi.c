@@ -6,21 +6,15 @@
  * Author: Alexander Becker galax.becker@live.de
  * Version: 0.0
  */
-
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/spi.h>
-#include <libopencm3/stm32/nvic.h>
-#include <stdlib.h>
 #include "armspi.h"
 
 struct hardware_pin {
 	uint32_t port;
 	uint32_t pin;
-}
+};
 
 #ifdef SPI_MODULE_0
-static struct hardware_pin connected_slaves_0[] =	{
+static const struct hardware_pin connected_slaves_0[] =	{
 	{.port = SPI_0_SLAVE_0_PORT, .pin = SPI_0_SLAVE_0_PIN}
 #ifdef SPI_0_SLAVE_1_PORT
 	{.port = SPI_0_SLAVE_1_PORT, .pin = SPI_0_SLAVE_1_PIN}
@@ -34,11 +28,11 @@ static struct hardware_pin connected_slaves_0[] =	{
 #ifdef SPI_0_SLAVE_4_PORT
 	{.port = SPI_0_SLAVE_4_PORT, .pin = SPI_0_SLAVE_4_PIN}
 #endif
-}
+};
 #endif
 
 #ifdef SPI_MODULE_1
-static struct hardware_pin connected_slaves_1[] =	{
+static const struct hardware_pin connected_slaves_1[] =	{
 	{.port = SPI_1_SLAVE_0_PORT, .pin = SPI_0_SLAVE_0_PIN}
 #ifdef SPI_1_SLAVE_1_PORT
 	{.port = SPI_1_SLAVE_1_PORT, .pin = SPI_1_SLAVE_1_PIN}
@@ -52,11 +46,11 @@ static struct hardware_pin connected_slaves_1[] =	{
 #ifdef SPI_1_SLAVE_4_PORT
 	{.port = SPI_1_SLAVE_4_PORT, .pin = SPI_1_SLAVE_4_PIN}
 #endif
-}
+};
 #endif
 
 #ifdef SPI_MODULE_2
-static struct hardware_pin connected_slaves_2[] =	{
+static const struct hardware_pin connected_slaves_2[] =	{
 	{.port = SPI_2_SLAVE_0_PORT, .pin = SPI_2_SLAVE_0_PIN}
 #ifdef SPI_2_SLAVE_1_PORT
 	{.port = SPI_2_SLAVE_1_PORT, .pin = SPI_2_SLAVE_1_PIN}
@@ -70,11 +64,11 @@ static struct hardware_pin connected_slaves_2[] =	{
 #ifdef SPI_2_SLAVE_4_PORT
 	{.port = SPI_2_SLAVE_4_PORT, .pin = SPI_2_SLAVE_4_PIN}
 #endif
-}
+};
 #endif
 
 #ifdef SPI_MODULE_3
-static struct hardware_pin connected_slaves_3[] =	{
+static const struct hardware_pin connected_slaves_3[] =	{
 	{.port = SPI_3_SLAVE_0_PORT, .pin = SPI_3_SLAVE_0_PIN}
 #ifdef SPI_3_SLAVE_1_PORT
 	{.port = SPI_3_SLAVE_1_PORT, .pin = SPI_3_SLAVE_1_PIN}
@@ -88,50 +82,50 @@ static struct hardware_pin connected_slaves_3[] =	{
 #ifdef SPI_3_SLAVE_4_PORT
 	{.port = SPI_3_SLAVE_4_PORT, .pin = SPI_3_SLAVE_4_PIN}
 #endif
-}
+};
 #endif
 
 #ifdef SPI_MODULE_4
-static struct hardware_pin connected_slaves_4[] =	{
-	{.port = SPI_4_SLAVE_0_PORT, .pin = SPI_4_SLAVE_0_PIN}
+static const struct hardware_pin connected_slaves_4[] =	{
+	{.port = SPI_4_SLAVE_0_PORT, .pin = SPI_4_SLAVE_0_PIN},
 #ifdef SPI_4_SLAVE_1_PORT
-	{.port = SPI_4_SLAVE_1_PORT, .pin = SPI_4_SLAVE_1_PIN}
+	{.port = SPI_4_SLAVE_1_PORT, .pin = SPI_4_SLAVE_1_PIN},
 #endif
 #ifdef SPI_4_SLAVE_2_PORT
-	{.port = SPI_4_SLAVE_2_PORT, .pin = SPI_4_SLAVE_2_PIN}
+	{.port = SPI_4_SLAVE_2_PORT, .pin = SPI_4_SLAVE_2_PIN},
 #endif
 #ifdef SPI_4_SLAVE_3_PORT
-	{.port = SPI_4_SLAVE_3_PORT, .pin = SPI_4_SLAVE_3_PIN}
+	{.port = SPI_4_SLAVE_3_PORT, .pin = SPI_4_SLAVE_3_PIN},
 #endif
 #ifdef SPI_4_SLAVE_4_PORT
-	{.port = SPI_4_SLAVE_4_PORT, .pin = SPI_4_SLAVE_4_PIN}
+	{.port = SPI_4_SLAVE_4_PORT, .pin = SPI_4_SLAVE_4_PIN},
 #endif
-}
+};
 #endif
 
 #ifdef SPI_MODULE_5
-static struct hardware_pin connected_slaves_5[] =	{
-	{.port = SPI_5_SLAVE_0_PORT, .pin = SPI_5_SLAVE_0_PIN}
+static const struct hardware_pin connected_slaves_5[] =	{
+	{.port = SPI_5_SLAVE_0_PORT, .pin = SPI_5_SLAVE_0_PIN},
 #ifdef SPI_5_SLAVE_1_PORT
-	{.port = SPI_5_SLAVE_1_PORT, .pin = SPI_5_SLAVE_1_PIN}
+	{.port = SPI_5_SLAVE_1_PORT, .pin = SPI_5_SLAVE_1_PIN},
 #endif
 #ifdef SPI_5_SLAVE_2_PORT
-	{.port = SPI_5_SLAVE_2_PORT, .pin = SPI_5_SLAVE_2_PIN}
+	{.port = SPI_5_SLAVE_2_PORT, .pin = SPI_5_SLAVE_2_PIN},
 #endif
 #ifdef SPI_5_SLAVE_3_PORT
-	{.port = SPI_5_SLAVE_3_PORT, .pin = SPI_5_SLAVE_3_PIN}
+	{.port = SPI_5_SLAVE_3_PORT, .pin = SPI_5_SLAVE_3_PIN},
 #endif
 #ifdef SPI_5_SLAVE_4_PORT
-	{.port = SPI_5_SLAVE_4_PORT, .pin = SPI_5_SLAVE_4_PIN}
+	{.port = SPI_5_SLAVE_4_PORT, .pin = SPI_5_SLAVE_4_PIN},
 #endif
-}
+};
 #endif
 
 struct packet {
 	uint8_t contents[PACKETLENGTH];
 	uint8_t writeindex;
 	uint8_t readindex;
-	uint8_t slave;
+	struct hardware_pin *slave;
 };
 
 struct ringbuffer {
@@ -142,128 +136,135 @@ struct ringbuffer {
 };
 
 struct spi {
-	uint8_t packet rbuffer[RECIEVEBUFFERLENGHT];
+	struct packet rbuffer[RECIEVEBUFFERLENGHT];
 	struct packet tbuffer[TRANSMITBUFFERLENGTH];
 	struct ringbuffer rxbuffer;
 	struct ringbuffer txbuffer;
 	uint8_t status;
 	uint32_t spi_hardware;
 	struct hardware_pin *connected_slaves;
-}
+};
 
 // if the module is activated the space for the buffers is allocated
 // and initialize the data structures
 
 #ifdef SPI_MODULE_0
-volatile struct spi *spi_module_0 = malloc(sizeof(struct spi));
-// transmit buffer initialization
-spi_module_0.txbuffer.start = spi_module_0.tbuffer;
-spi_module_0.txbuffer.head = spi_module_0.tbuffer;
-spi_module_0.txbuffer.tail = spi_module_0.tbuffer;
-spi_module_0.txbuffer.buffersize = TRANSMITBUFFERLENGTH;
-// recieve buffer initialization
-spi_module_0.rxbuffer.start = spi_module_0.rbuffer;
-spi_module_0.rxbuffer.head = spi_module_0.rbuffer;
-spi_module_0.rxbuffer.tail = spi_module_0.rbuffer;
-spi_module_0.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
-// set the corresponding hardware address
-spi_module_0.spi_hardware = SPI1
-// link the slave select pin arrays via a pointer
-spi_module_0.connected_slaves = connected_slaves_0;
+volatile struct spi spi_module_0 = {
+	.txbuffer = {
+		.start = &spi_module_0.tbuffer,
+		.head =  &spi_module_0.tbuffer,
+		.tail =  &spi_module_0.tbuffer,
+		.buffersize = TRANSMITBUFFERLENGTH,
+	},
+	.rxbuffer = {
+		.start = &spi_module_0.rbuffer,
+		.head = &spi_module_0.rbuffer,
+		.tail = &spi_module_0.rbuffer,
+		.buffersize = RECIEVEBUFFERLENGHT,
+	},
+	.spi_hardware = SPI1,
+	.connected_slaves = connected_slaves_0,
+};
 #endif
 
 #ifdef SPI_MODULE_1
-volatile struct spi *spi_module_1 = malloc(sizeof(struct spi));
-// transmit buffer initialization
-spi_module_1.txbuffer.start = spi_module_1.tbuffer;
-spi_module_1.txbuffer.head = spi_module_1.tbuffer;
-spi_module_1.txbuffer.tail = spi_module_1.tbuffer;
-spi_module_1.txbuffer.buffersize = TRANSMITBUFFERLENGTH;
-// recieve buffer initialization
-spi_module_1.rxbuffer.start = spi_module_1.rbuffer;
-spi_module_1.rxbuffer.head = spi_module_1.rbuffer;
-spi_module_1.rxbuffer.tail = spi_module_1.rbuffer;
-spi_module_1.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
-// set the corresponding hardware address
-spi_module_1.spi_hardware = SPI2
-// link the slave select pin arrays via a pointer
-spi_module_1.connected_slaves = connected_slaves_1;
+volatile struct spi spi_module_1 = {
+	.txbuffer = {
+		.start = &spi_module_1.tbuffer,
+		.head =  &spi_module_1.tbuffer,
+		.tail =  &spi_module_1.tbuffer,
+		.buffersize = TRANSMITBUFFERLENGTH,
+	},
+	.rxbuffer = {
+		.start = &spi_module_1.rbuffer,
+		.head = &spi_module_1.rbuffer,
+		.tail = &spi_module_1.rbuffer,
+		.buffersize = RECIEVEBUFFERLENGHT,
+	},
+	.spi_hardware = SPI2,
+	.connected_slaves = connected_slaves_1,
+};
 #endif
 
 #ifdef SPI_MODULE_2
-volatile struct spi *spi_module_2 = malloc(sizeof(struct spi));
-// transmit buffer initialization
-spi_module_2.txbuffer.start = spi_module_2.tbuffer;
-spi_module_2.txbuffer.head = spi_module_2.tbuffer;
-spi_module_2.txbuffer.tail = spi_module_2.tbuffer;
-spi_module_2.txbuffer.buffersize = TRANSMITBUFFERLENGTH;
-// recieve buffer initialization
-spi_module_2.rxbuffer.start = spi_module_2.rbuffer;
-spi_module_2.rxbuffer.head = spi_module_2.rbuffer;
-spi_module_2.rxbuffer.tail = spi_module_2.rbuffer;
-spi_module_2.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
-// set the corresponding hardware address
-spi_module_2.spi_hardware = SPI3
-// link the slave select pin arrays via a pointer
-spi_module_2.connected_slaves = connected_slaves_2;
+volatile struct spi spi_module_2 = {
+	.txbuffer = {
+		.start = &spi_module_2.tbuffer,
+		.head =  &spi_module_2.tbuffer,
+		.tail =  &spi_module_2.tbuffer,
+		.buffersize = TRANSMITBUFFERLENGTH,
+	},
+	.rxbuffer = {
+		.start = &spi_module_2.rbuffer,
+		.head = &spi_module_2.rbuffer,
+		.tail = &spi_module_2.rbuffer,
+		.buffersize = RECIEVEBUFFERLENGHT,
+	},
+	.spi_hardware = SPI3,
+	.connected_slaves = connected_slaves_2,
+};
 #endif
 
 #ifdef SPI_MODULE_3
 // transmit buffer initialization
-volatile struct spi *spi_module_3 = malloc(sizeof(struct spi));
-spi_module_3.txbuffer.start = spi_module_3.tbuffer;
-spi_module_3.txbuffer.head = spi_module_3.tbuffer;
-spi_module_3.txbuffer.tail = spi_module_3.tbuffer;
-spi_module_3.txbuffer.buffersize = TRANSMITBUFFERLENGTH;
-// recieve buffer initialization
-spi_module_3.rxbuffer.start = spi_module_3.rbuffer;
-spi_module_3.rxbuffer.head = spi_module_3.rbuffer;
-spi_module_3.rxbuffer.tail = spi_module_3.rbuffer;
-spi_module_3.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
-// set the corresponding hardware address
-spi_module_3.spi_hardware = SPI4
-// link the slave select pin arrays via a pointer
-spi_module_3.connected_slaves = connected_slaves_3;
+volatile struct spi spi_module_3 = {
+	.txbuffer = {
+		.start = &spi_module_3.tbuffer,
+		.head =  &spi_module_3.tbuffer,
+		.tail =  &spi_module_3.tbuffer,
+		.buffersize = TRANSMITBUFFERLENGTH,
+	},
+	.rxbuffer = {
+		.start = &spi_module_3.rbuffer,
+		.head = &spi_module_3.rbuffer,
+		.tail = &spi_module_3.rbuffer,
+		.buffersize = RECIEVEBUFFERLENGHT,
+	},
+	.spi_hardware = SPI4,
+	.connected_slaves = connected_slaves_3,
+};
 #endif
 
 #ifdef SPI_MODULE_4
-volatile struct spi *spi_module_4 = malloc(sizeof(struct spi));
-// transmit buffer initialization
-spi_module_4.txbuffer.start = spi_module_4.tbuffer;
-spi_module_4.txbuffer.head = spi_module_4.tbuffer;
-spi_module_4.txbuffer.tail = spi_module_4.tbuffer;
-spi_module_4.txbuffer.buffersize = TRANSMITBUFFERLENGTH;
-// recieve buffer initialization
-spi_module_4.rxbuffer.start = spi_module_4.rbuffer;
-spi_module_4.rxbuffer.head = spi_module_4.rbuffer;
-spi_module_4.rxbuffer.tail = spi_module_4.rbuffer;
-spi_module_4.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
-// set the corresponding hardware address
-spi_module_4.spi_hardware = SPI5
-// link the slave select pin arrays via a pointer
-spi_module_4.connected_slaves = connected_slaves_4;
+volatile struct spi spi_module_4 = {
+	.txbuffer = {
+		.start = &spi_module_4.tbuffer,
+		.head =  &spi_module_4.tbuffer,
+		.tail =  &spi_module_4.tbuffer,
+		.buffersize = TRANSMITBUFFERLENGTH,
+	},
+	.rxbuffer = {
+		.start = &spi_module_4.rbuffer,
+		.head = &spi_module_4.rbuffer,
+		.tail = &spi_module_4.rbuffer,
+		.buffersize = RECIEVEBUFFERLENGHT,
+	},
+	.spi_hardware = SPI5,
+	.connected_slaves = connected_slaves_4,
+};
 #endif
 
 #ifdef SPI_MODULE_5
-volatile struct spi *spi_module_5 = malloc(sizeof(struct spi));
-// transmit buffer initialization
-spi_module_5.txbuffer.start = spi_module_5.tbuffer;
-spi_module_5.txbuffer.head = spi_module_5.tbuffer;
-spi_module_5.txbuffer.tail = spi_module_5.tbuffer;
-spi_module_5.txbuffer.buffersize = TRANSMITBUFFERLENGTH;
-// recieve buffer initialization
-spi_module_5.rxbuffer.start = spi_module_5.rbuffer;
-spi_module_5.rxbuffer.head = spi_module_5.rbuffer;
-spi_module_5.rxbuffer.tail = spi_module_5.rbuffer;
-spi_module_5.rxbuffer.buffersize = RECIEVEBUFFERLENGHT;
-// set the corresponding hardware address
-spi_module_5.spi_hardware = SPI6
-// link the slave select pin arrays via a pointer
-spi_module_5.connected_slaves = connected_slaves_5;
+volatile struct spi spi_module_5 = {
+	.txbuffer = {
+		.start = &spi_module_5.tbuffer,
+		.head =  &spi_module_5.tbuffer,
+		.tail =  &spi_module_5.tbuffer,
+		.buffersize = TRANSMITBUFFERLENGTH,
+	},
+	.rxbuffer = {
+		.start = &spi_module_5.rbuffer,
+		.head = &spi_module_5.rbuffer,
+		.tail = &spi_module_5.rbuffer,
+		.buffersize = RECIEVEBUFFERLENGHT,
+	},
+	.spi_hardware = SPI6,
+	.connected_slaves = connected_slaves_5,
+};
 #endif
 
 // TODO this is not finished yet
-void init_spi(uint8_t mode, struct spi *spi_module){
+void init_spi(uint8_t mode){
 	// set up the Hardware modules and pins
 	if(mode == SPI_MASTER){
 		#ifdef SPI_MODULE_0
@@ -389,77 +390,77 @@ void init_spi(uint8_t mode, struct spi *spi_module){
 	}
 	else{
 		// TODO follow the procedure on page 697 of the manual
-	#ifdef SPI_MODULE_0
 	}
 }
 
 // helper funktions -----------------------------------------------------------
-void set_SS_pin_high(struct hardware_pin ssline){
-	gpio_set(ssline.port, ssline.pin);
+void set_SS_pin_high(struct hardware_pin *ssline){
+	gpio_set(ssline->port, ssline->pin);
 }
 
-void set_SS_pin_low(struct hardware_pin ssline){
-	gpio_clear(ssline.port, ssline.pin);
+void set_SS_pin_low(struct hardware_pin *ssline){
+	gpio_clear(ssline->port, ssline->pin);
 }
 
 void increment_bufferpointer(struct packet *pointer, struct ringbuffer *buffer){
 	pointer ++;
-	if(pointer >= buffer.start+buffersize){
-		pointer = buffer.start;
+	if(pointer >= buffer->start+buffer->buffersize){
+		pointer = buffer->start;
 	}
 }
 // end helper functions -------------------------------------------------------
 
 
 // the first byte of the 16Bit is the "flag-register"
-uint16_t spi_irq_master_handler(struct spi *spimodule, uint32_t spi, uint32_t pin){
-	rxdata = spi_read(spi);
-	spimodule.rxbuffer.head.contents[spimodule.rxbuffer.head.writeindex] = uint8_t(rxdata);
-	spimodule.rxbuffer.head.writeindex++;
-	if(spimodule.status & SPI_PACKET_BEING_SENT){
-		spi_write(spi, uint16_t(spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.readindex]));
-		spimodule.txbuffer.tail.readindex++;
-		if(spimodule.txbuffer.tail.readindex < spimodule.txbuffer.tail.writeindex){
-			return 0;
+void spi_irq_master_handler(struct spi *spimodule){
+	uint8_t rxdata = spi_read(spimodule->spi_hardware);
+	spimodule->rxbuffer.head->contents[spimodule->rxbuffer.head->writeindex] = rxdata;
+	spimodule->rxbuffer.head->writeindex++;
+	if(spimodule->status & SPI_PACKET_BEING_SENT){
+		spi_write(spimodule->spi_hardware, (uint16_t)(spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]));
+		spimodule->txbuffer.tail->readindex++;
+		if(spimodule->txbuffer.tail->readindex < spimodule->txbuffer.tail->writeindex){
+			return;
 		}
 		else{
-			spimodule.status &= ~SPI_PACKET_BEING_SENT;
-			spimodule.txbuffer.tail.writeindex = 0;
-			spimodule.txbuffer.tail.readindex = 0;
-			return 0;
+			spimodule->status &= ~SPI_PACKET_BEING_SENT;
+			spimodule->txbuffer.tail->writeindex = 0;
+			spimodule->txbuffer.tail->readindex = 0;
+			return;
 		}
 	}
 	else{
-		set_SS_pin_high(pin);
-		increment_bufferpointer(spimodule.rxbuffer.head, spimodule.rxbuffer);
-		increment_bufferpointer(spimodule.txbuffer.tail, spimodule.txbuffer);
-		if(spimodule.rxbuffer.head == spimodule.rxbuffer.tail){
-			spimodule.rxbuffer.tail.writeindex = 0;
-			spimodule.rxbuffer.tail.readindex = 0;
-			increment_bufferpointer(spimodule.rxbuffer.tail, spimodule.rxbuffer);
-			spimodule.rxbuffer.tail.writeindex = 0;
-			spimodule.rxbuffer.tail.readindex = 0;
+		set_SS_pin_high(spimodule->txbuffer.head->slave);
+		increment_bufferpointer(spimodule->rxbuffer.head, &(spimodule->rxbuffer));
+		increment_bufferpointer(spimodule->txbuffer.tail, &(spimodule->txbuffer));
+		if(spimodule->rxbuffer.head == spimodule->rxbuffer.tail){
+			spimodule->rxbuffer.tail->writeindex = 0;
+			spimodule->rxbuffer.tail->readindex = 0;
+			increment_bufferpointer(spimodule->rxbuffer.tail, &(spimodule->rxbuffer));
+			spimodule->rxbuffer.tail->writeindex = 0;
+			spimodule->rxbuffer.tail->readindex = 0;
 		}
-		if(spimodule.txbuffer.tail == spimodule.txbuffer.head){
-			spimodule.status |= SPIBUFFER_EMPTY;
+		if(spimodule->txbuffer.tail == spimodule->txbuffer.head){
+			spimodule->status |= SPIBUFFER_EMPTY;
 		}
 		else{
-			set_SS_pin_low(pin);
-			if(spimodule.txbuffer.tail.writeindex > 1){
-				spimodule.status |= SPI_PACKET_BEING_SENT;
+			set_SS_pin_low(spimodule->txbuffer.head->slave);
+			if(spimodule->txbuffer.tail->writeindex > 1){
+				spimodule->status |= SPI_PACKET_BEING_SENT;
 			}
-			spi_write(spi, spimodule.txbuffer.tail.contents[spimodule.txbuffer.tail.readindex]);
-			return 0;
+			spi_write(spimodule->spi_hardware, spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]);
+			return;
 		}
 	}
 }
 
-uint16_t spi_irq_slave_handler(struct spi *spimodule, uint8_t data){
-	uint8_t tmprxdata = spi_read(spi);
-	for(uint8_t i=0; i>=MAXLOOP; i++){
-		if()
-	}
-}
+//uint16_t spi_irq_slave_handler(struct spi *spimodule, uint8_t data){
+//	// TODO finish the slave IRQ handler
+//	uint8_t tmprxdata = spi_read(spi);
+//	for(uint8_t i=0; i>=MAXLOOP; i++){
+//		if()
+//	}
+//}
 
 #ifdef SPI_MODULE_0
 void spi1_isr(void){
@@ -470,6 +471,7 @@ void spi1_isr(void){
 		spi_irq_slave_handler(spi_module_0);
 	}
 }
+#endif
 
 #ifdef SPI_MODULE_1
 void spi2_isr(void){
@@ -480,6 +482,7 @@ void spi2_isr(void){
 		spi_irq_slave_handler(spi_module_1);
 	}
 }
+#endif
 
 #ifdef SPI_MODULE_2
 void spi3_isr(void){
@@ -490,6 +493,7 @@ void spi3_isr(void){
 		spi_irq_slave_handler(spi_module_2);
 	}
 }
+#endif
 
 #ifdef SPI_MODULE_3
 void spi4_isr(void){
@@ -500,6 +504,7 @@ void spi4_isr(void){
 		spi_irq_slave_handler(spi_module_3);
 	}
 }
+#endif
 
 #ifdef SPI_MODULE_4
 void spi5_isr(void){
@@ -510,6 +515,7 @@ void spi5_isr(void){
 		spi_irq_slave_handler(spi_module_4);
 	}
 }
+#endif
 
 #ifdef SPI_MODULE_5
 void spi6_isr(void){
@@ -520,3 +526,4 @@ void spi6_isr(void){
 		spi_irq_slave_handler(spi_module_5);
 	}
 }
+#endif
