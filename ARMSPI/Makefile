@@ -1,7 +1,7 @@
 TOPDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 TARGET=DSTM32F1
-OBJ = spi.o
+OBJ = armspi.o
 
 CROSS_PREFIX ?= arm-none-eabi-
 CC=$(CROSS_PREFIX)gcc
