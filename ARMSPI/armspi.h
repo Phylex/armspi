@@ -15,12 +15,13 @@
 //the defines for the bits in the spi struct status byte
 #define SPIBUFFER_EMPTY		(1<<7)
 #define SPIBUFFER_FULL		(1<<6)
-#define SPI_PACKET_BEING_SENT	(1<<5)
-#define SPI_MASTER		(1<<4)
+#define SPI_MASTER		(1<<5)
+#define SPI_PACKET_RECIEVED	(1<<4)
 
 #define PACKETLENGTH 4
 #define TRANSMITBUFFERLENGTH 4
 #define RECIEVEBUFFERLENGHT 4
+#define MAXLOOP 10
 
 //Uncomment, to activate the module
 // #define SPI_MODULE_0
