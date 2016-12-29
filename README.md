@@ -59,12 +59,16 @@ The Library needs some information at compiletime:
     It includes the default pins for that device as defined in the libopencm3 for that device.
 
 ## The handling of Slaves
-This library is generally capable of handling multiple Slaves. Therefore the SSM on the STM's is enabled. To enable a second slave, define the port and pin and in the header everything else should be done at compiletime. every other port and pin definition schould be commented out.
-If using more than 5 Slaves, one has to edit the armspi.c file and add another line in the initialisations of the `connected_slaves_(modulenumber)` in the same manner the others have been added.
+This library is generally capable of handling multiple Slaves. 
+Every module points to an array of hardware_pin structs, that are the SS-Pins that are driven. 
+Therefore the SSM on the STM's is enabled. To enable a second slave, define the port and pin and in the header everything else should be done at compiletime. every other port and pin definition schould be commented out. 
+If using more than 5 Slaves, one has to edit the armspi.c file and add another line in the initialisations of the `connected_slaves_(modulenumber)` in the same manner the others have been added to the code.
 The naming convention should be fairly obvious and I recomment do follow it.
 The Naming convention is as follows:
 In `SPI_N_SLAVE_M_[PORT/PIN]` the N denotes the number of the Module and the M denotes the number of the Slave connected.
 
+## Being a Slave
+When the chip is set into slave mode, it polls the 0th pin specified in the connected_slaves list of the 
 ## Iterrupt handling
 The data and is mostly hadeled within the interrupt routine. This checks the state of the packet in the status register and then manipulates the data accordingly, eighther sending the next byte of data,
 selecting the next paket for sending or shutting down the clock because the buffer is empty.
