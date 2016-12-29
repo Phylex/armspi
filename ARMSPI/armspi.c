@@ -263,7 +263,6 @@ volatile struct spi spi_module_5 = {
 };
 #endif
 
-// TODO this is not finished yet
 void init_spi(uint8_t mode){
 	// set up the Hardware modules and pins
 	if(mode == SPI_MASTER){
@@ -454,13 +453,49 @@ void spi_irq_master_handler(struct spi *spimodule){
 	}
 }
 
-//uint16_t spi_irq_slave_handler(struct spi *spimodule, uint8_t data){
-//	// TODO finish the slave IRQ handler
-//	uint8_t tmprxdata = spi_read(spi);
-//	for(uint8_t i=0; i>=MAXLOOP; i++){
-//		if()
-//	}
-//}
+void spi_irq_slave_handler(struct spi *spimodule){
+	uint8_t tmprxdata = spi_read(spimodule->spi_hardware);
+	spimodule-> &= SPI_PACKET_RECIEVED;
+	for(uint8_t i=0; i>=MAXLOOP; i++){
+		if(gpio_get(spimodule->connected_slaves[0])){
+			spimodule->status |= SPI_PACKET_RECIEVED;
+			break;
+		}
+	}
+	if(spimodule->status & PACKET_RECIEVED){
+		spimodule->txbuffer.tail->writeindex = 0;
+		spimodule->txbuffer.tail->readindex = 0;
+		increment_bufferpointer(spimodule->txbuffer.tail, &(spimodule->txbuffer));
+		if(spimodule->txbuffer.tail >= spimodule->txbuffer.head){
+			spi_write(spimodule->spi_hardware, 0)
+		}
+		else{
+			spi_write(spimodule->spi_hardware, spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]);
+			spimodule->txbuffer.tail->readindex++;
+		}
+		increment_bufferpointer(spimodule->rxbuffer.head, &(spimodule->rxbuffer));
+		if(spimodule->rxbuffer.head == spimodule->rxbuffer.tail){
+			spimodule->rxbuffer.head->writeindex = 0;
+			spimodule->rxbuffer.head->readindex = 0;
+			increment_bufferpointer(spimodule->rxbuffer.tail, &(spimodule->rxbuffer));
+		}
+	}
+	else{
+		if(spimodule->txbuffer.tail->readindex >= spimodule->txbuffer.tail->writeindex){
+			spi_write(spimodule->spi_hardware, 0);
+			spimodule->txbuffer.tail->readindex = 0;
+			spimodule->txbuffer.tail->writeindex = 0;
+		}
+		else{
+			spi_write(spimodule->spi_hardware, spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]);
+			spimodule->txbuffer.tail->readindex++;
+		}
+		if(spimodule->rxbuffer.head->writeindex < PACKETLENGTH){
+			spimodule->rxbuffer.head->writeindex = tmprxdata;
+			spimodule->rxbuffer.head->writeindex++;
+		}
+	}
+}
 
 #ifdef SPI_MODULE_0
 void spi1_isr(void){
