@@ -408,9 +408,24 @@ void increment_bufferpointer(struct packet *pointer, struct ringbuffer *buffer){
 	}
 }
 // end helper functions -------------------------------------------------------
+void write_spi_packet(){
+	
+}
 
+uint8_t read_spi_packet(struct spi *spimodule, uint8_t *data, uint8_t size){
+	uint8_t i;
+	if(spimodule->rxbuffer.tail == spimodule->rxbuffer.head){
+		return 0;
+	}
+	for(i = 0; i < spimodule->rxbuffer.tail->writeindex && i < size; i++){
+		*data = spimodule->rxbuffer.tail->contents[i];
+	}
+	spimodule->rxbuffer.tail->writeindex = 0;
+	spimodule->rxbuffer.tail->readindex = 0;
+	increment_bufferpointer(spimodule->rxbuffer.tail, spimodule->rxbuffer);
+	return i;
+}
 
-// the first byte of the 16Bit is the "flag-register"
 void spi_irq_master_handler(struct spi *spimodule){
 	uint8_t rxdata = spi_read(spimodule->spi_hardware);
 	spimodule->rxbuffer.head->contents[spimodule->rxbuffer.head->writeindex] = rxdata;
