@@ -9,7 +9,7 @@ OBJCOPY=$(CROSS_PREFIX)objcopy
 SIZE=$(CROSS_PREFIX)size
 
 CFLAGS = -Wall -Wextra -std=gnu99 -I../libopencm3/include -I ../common -$(TARGET) -mcpu=cortex-m3 -mthumb -fno-common -ffreestanding -Og -g
-LDFLAGS = -lopencm3_stm32f1 -L../libopencm3/lib -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections -flto -T stm32f100x8-usbdfu.ld -g
+LDFLAGS = -lopencm3_stm32f1 -L../libopencm3/lib -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections -flto -g
 
 all: armspi.bin
 
