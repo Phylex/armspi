@@ -17,6 +17,7 @@
 #define SPIBUFFER_FULL		(1<<6)
 #define SPI_MASTER		(1<<5)
 #define SPI_PACKET_RECIEVED	(1<<4)
+#define SPI_PACKET_BEING_SENT	(1<<3)
 
 #define PACKETLENGTH 4
 #define TRANSMITBUFFERLENGTH 4
@@ -118,5 +119,34 @@
 #define SPI_5_SCK_PIN    GPIO_BANK_SPI6_SCK
 #define SPI_5_SCK_PORT   GPIO_SPI6_SCK
 
+struct hardware_pin;
+
+struct packet {
+	uint8_t contents[PACKETLENGTH];
+	uint8_t writeindex;
+	uint8_t readindex;
+	struct hardware_pin *slave;
+};
+
+struct ringbuffer {
+	uint32_t buffersize;
+	struct packet *start;
+	struct packet *head;
+	struct packet *tail;
+};
+
+struct spi {
+	struct packet rbuffer[RECIEVEBUFFERLENGHT];
+	struct packet tbuffer[TRANSMITBUFFERLENGTH];
+	struct ringbuffer rxbuffer;
+	struct ringbuffer txbuffer;
+	uint8_t status;
+	uint32_t spi_hardware;
+	struct hardware_pin *connected_slaves;
+};
+
+void init_spi(uint8_t mode);
+uint8_t write_spi_packet(struct spi *spimodule, uint8_t *data, uint8_t size);
+uint8_t read_spi_packet(struct spi *spimodule, uint8_t *data, uint8_t size);
 
 #endif
