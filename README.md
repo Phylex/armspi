@@ -27,9 +27,9 @@ The interface consits of:
     initialises SPI, configuring clock and SPI interface. The baudrate is given and mached as good as possible using the prescalars available in the hardware.
     To calculate the speed at wich the Clock of the SPI has to be set to nearest mach the bauderate given it will read the setting from the RCC unit
 
-* `write_SPI(*data, size)`
+* `uint8_t write_SPI(*data, size)`
 
-    writes the data given as argument into a packet in the send buffer.
+    writes the data given as argument into a packet in the send buffer. This funktion clears the tail of the txbuffer if they collide even if it is in the process of being sent. (double buffering is planned at one point). The interrupt then assumes that the packet has been sent entirely and proceeds to the next. So make sure that the rate of data to be sent does not surpass the confiigured data output.
 
 * `read_SPI()`
 
