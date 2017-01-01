@@ -1,17 +1,24 @@
 TOPDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-TARGET=DSTM32F1
-OBJ = armspi.o
+BINARY = armspi
 
-CROSS_PREFIX ?= arm-none-eabi-
-CC=$(CROSS_PREFIX)gcc
-OBJCOPY=$(CROSS_PREFIX)objcopy
-SIZE=$(CROSS_PREFIX)size
+DEVICE = stm32f103c8t6
 
-CFLAGS = -Wall -Wextra -std=gnu99 -I../libopencm3/include -I ../common -$(TARGET) -mcpu=cortex-m3 -mthumb -fno-common -ffreestanding -Og -g
-LDFLAGS = -lopencm3_stm32f1 -L../libopencm3/lib -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections -T #still have to edit this -flto -g
+TOOLCHAIN_DIR	= ../libopencm3
 
-all: armspi.bin
+CROSS_PREFIX	?= arm-none-eabi-
+CC		= $(CROSS_PREFIX)gcc
+OBJCOPY		= $(CROSS_PREFIX)objcopy
+SIZE		= $(CROSS_PREFIX)size
+
+CFLAGS		= -Wall -Wextra -std=gnu99 -I../libopencm3/include -I ../common -$(TARGET) -mcpu=cortex-m3 -mthumb -fno-common -ffreestanding -Og -g
+LDSCRIPT	?= $(BINARY).ld
+LDFLAGS		= -lopencm3_stm32f1 -L../libopencm3/lib -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections
+OBJ		= $(BINARY).o
+
+include $(TOOLCHAIN_DIR)/ld/Makefile.linker
+
+all: $(BINARY).bin
 
 armspi.elf: $(OBJ)
 	$(CC) -o armspi.elf $^ $(LDFLAGS)
@@ -23,16 +30,13 @@ armspi.elf: $(OBJ)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-flash: armspi.bin
+flash: $(BINARY).bin
 	echo "reset halt; flash write_image erase unlock $(TOPDIR)/armspi.bin 0x8000000; reset" | nc 127.0.0.1 4444
 
 clean:
-	rm -f *.o armspi.elf armspi.bin
+	rm -f *.o $(BINARY).elf $(BINARY).bin
 
 debug:
-	arm-none-eabi-gdb  -ex 'target extended-remote :3333' armspi.elf
-
-preproc:
-	$(CC) $(CFLAGS) -E testscript.c
+	arm-none-eabi-gdb  -ex 'target extended-remote :3333' $(BINARY).elf
 
 .PHONY: all flash clean debug
