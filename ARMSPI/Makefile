@@ -6,6 +6,8 @@ DEVICE = stm32f103c8t6
 
 TOOLCHAIN_DIR	= ../libopencm3
 
+TARGET = DSTM32F1
+
 CROSS_PREFIX	?= arm-none-eabi-
 CC		= $(CROSS_PREFIX)gcc
 OBJCOPY		= $(CROSS_PREFIX)objcopy
@@ -16,11 +18,12 @@ LDSCRIPT	?= $(BINARY).ld
 LDFLAGS		= -lopencm3_stm32f1 -L../libopencm3/lib -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections
 OBJ		= $(BINARY).o
 
-include $(TOOLCHAIN_DIR)/ld/Makefile.linker
 
 all: $(BINARY).bin
 
-armspi.elf: $(OBJ)
+include $(TOOLCHAIN_DIR)/ld/Makefile.linker
+
+$(BINARY).elf: $(OBJ)
 	$(CC) -o armspi.elf $^ $(LDFLAGS)
 	$(SIZE) -B armspi.elf
 
