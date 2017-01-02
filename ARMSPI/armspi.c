@@ -240,10 +240,33 @@ volatile struct spi spi_module_5 = {
 };
 #endif
 
-void init_spi(uint8_t mode){
-	// set up the Hardware modules and pins
-	if(mode == SPI_MASTER){
+void init_spi	(
 		#ifdef SPI_MODULE_0
+		uint8_t mode0,
+		#endif
+
+		#ifdef SPI_MODULE_1
+		uint8_t mode1
+		#endif
+
+		#ifdef SPI_MODULE_2
+		uint8_t mode2
+		#endif
+
+		#ifdef SPI_MODULE_3
+		uint8_t mode3
+		#endif
+
+		#ifdef SPI_MODULE_4
+		uint8_t mode4
+		#endif
+
+		#ifdef SPI_MODULE_5
+		uint8_t mode5
+		){
+
+	#ifdef SPI_MODULE_0
+	if(mode0 == SPI_MASTER){
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_0_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_0_MISO_PIN);
@@ -261,111 +284,10 @@ void init_spi(uint8_t mode){
 		spi_disable_crc(spi_module_0.spi_hardware);
 		spi_enable_rx_buffer_not_empty_interrupt(spi_module_0.spi_hardware);
 		spi_enable_software_slave_management(spi_module_0.spi_hardware);
+		spi_module_0.status |= SPI_MASTER;
 		spi_enable(spi_module_0.spi_hardware);
-		#endif
-
-		#ifdef SPI_MODULE_1
-		// Configuring the Hardware Interface
-		// MISO
-		gpio_set_mode(SPI_1_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_1_MISO_PIN);
-		// MOSI
-		gpio_set_mode(SPI_1_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_1_MOSI_PIN);
-		// SCK
-		gpio_set_mode(SPI_1_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_1_SCK_PIN);
-		// Slaves
-		for(uint8_t i=0, i < SPI_1_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_0.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_1.connected_slaves[i].pin);
-		}
-		spi_init_master(spi_module_1.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
-				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-		spi_disable_crc(spi_module_1.spi_hardware)
-		spi_enable_rx_buffer_not_empty_interrupt(spi_module_1.spi_hardware);
-		spi_enable_software_slave_management(spi_module_1.spi_hardware);
-		spi_enable(spi_module_1.spi_hardware);
-		#endif
-
-		#ifdef SPI_MODULE_2
-		// Configuring the Hardware Interface
-		// MISO
-		gpio_set_mode(SPI_2_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_2_MISO_PIN);
-		// MOSI
-		gpio_set_mode(SPI_2_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_MOSI_PIN);
-		// SCK
-		gpio_set_mode(SPI_2_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_SCK_PIN);
-		// Slaves
-		for(uint8_t i=0, i < SPI_2_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_2.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_2.connected_slaves[i].pin);
-		}
-		spi_init_master(spi_module_2.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
-				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-		spi_disable_crc(spi_module_2.spi_hardware)
-		spi_enable_rx_buffer_not_empty_interrupt(spi_module_2.spi_hardware);
-		spi_enable_software_slave_management(spi_module_2.spi_hardware);
-		spi_enable(spi_module_2.spi_hardware);
-		#endif
-
-		#ifdef SPI_MODULE_3
-		// Configuring the Hardware Interface
-		// MISO
-		gpio_set_mode(SPI_3_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_3_MISO_PIN);
-		// MOSI
-		gpio_set_mode(SPI_3_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_3_MOSI_PIN);
-		// SCK
-		gpio_set_mode(SPI_3_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_3_SCK_PIN);
-		// Slaves
-		for(uint8_t i=0, i < SPI_0_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_3.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_3.connected_slaves[i].pin);
-		}
-		spi_init_master(spi_module_3.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
-				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-		spi_disable_crc(spi_module_3.spi_hardware)
-		spi_enable_rx_buffer_not_empty_interrupt(spi_module_3.spi_hardware);
-		spi_enable_software_slave_management(spi_module_3.spi_hardware);
-		spi_enable(spi_module_3.spi_hardware);
-		#endif
-
-		#ifdef SPI_MODULE_4
-		// Configuring the Hardware Interface
-		// MISO
-		gpio_set_mode(SPI_4_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_4_MISO_PIN);
-		// MOSI
-		gpio_set_mode(SPI_4_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_4_MOSI_PIN);
-		// SCK
-		gpio_set_mode(SPI_4_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_4_SCK_PIN);
-		// Slaves
-		for(uint8_t i=0, i < SPI_4_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_4.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_4.connected_slaves[i].pin);
-		}
-		spi_init_master(spi_module_4.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
-				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-		spi_disable_crc(spi_module_4.spi_hardware)
-		spi_enable_rx_buffer_not_empty_interrupt(spi_module_4.spi_hardware);
-		spi_enable_software_slave_management(spi_module_4.spi_hardware);
-		spi_enable(spi_module_4.spi_hardware);
-		#endif
-
-		#ifdef SPI_MODULE_5
-		// Configuring the Hardware Interface
-		// MISO
-		gpio_set_mode(SPI_5_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_5_MISO_PIN);
-		// MOSI
-		gpio_set_mode(SPI_5_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_5_MOSI_PIN);
-		// SCK
-		gpio_set_mode(SPI_5_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_5_SCK_PIN);
-		// Slaves
-		for(uint8_t i=0, i < SPI_5_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_5.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_5.connected_slaves[i].pin);
-		}
-		spi_init_master(spi_module_5.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
-				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-		spi_disable_crc(spi_module_5.spi_hardware)
-		spi_enable_rx_buffer_not_empty_interrupt(spi_module_5.spi_hardware);
-		spi_enable_software_slave_management(spi_module_5.spi_hardware);
-		spi_enable(spi_module_5.spi_hardware);
-		#endif
 	}
 	else{
-		#ifdef SPI_MODULE_0
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_0_MISO_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_0_MISO_PIN);
@@ -383,8 +305,31 @@ void init_spi(uint8_t mode){
 		spi_send_msb_first(spi_module_0.spi_hardware);
 		spi_disable_software_slave_management(spi_module_0.spi_hardware);
 		spi_enable(spi_module_0.spi_hardware);
-		#endif
+	}
+	#endif
 
+	#ifdef SPI_MODULE_1
+	if(mode1 == SPI_MASTER){
+		// Configuring the Hardware Interface
+		// MISO
+		gpio_set_mode(SPI_1_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_1_MISO_PIN);
+		// MOSI
+		gpio_set_mode(SPI_1_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_1_MOSI_PIN);
+		// SCK
+		gpio_set_mode(SPI_1_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_1_SCK_PIN);
+		// Slaves
+		for(uint8_t i=0, i < SPI_1_CONNECTED_SLAVES; i++){
+			gpio_set_mode(spi_module_0.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_1.connected_slaves[i].pin);
+		}
+		spi_init_master(spi_module_1.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
+				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+		spi_disable_crc(spi_module_1.spi_hardware)
+		spi_enable_rx_buffer_not_empty_interrupt(spi_module_1.spi_hardware);
+		spi_enable_software_slave_management(spi_module_1.spi_hardware);
+		spi_module_1.status |= SPI_MASTER;
+		spi_enable(spi_module_1.spi_hardware);
+	}
+	else{
 		#ifdef SPI_MODULE_1
 		// Configuring the Hardware Interface
 		// MISO
@@ -403,9 +348,31 @@ void init_spi(uint8_t mode){
 		spi_send_msb_first(spi_module_1.spi_hardware);
 		spi_disable_software_slave_management(spi_module_1.spi_hardware);
 		spi_enable(spi_module_1.spi_hardware);
-		#endif
+	}
+	#endif
 
-		#ifdef SPI_MODULE_2
+	#ifdef SPI_MODULE_2
+	if(mode2 == SPI_MASTER){
+		// Configuring the Hardware Interface
+		// MISO
+		gpio_set_mode(SPI_2_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_2_MISO_PIN);
+		// MOSI
+		gpio_set_mode(SPI_2_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_MOSI_PIN);
+		// SCK
+		gpio_set_mode(SPI_2_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_SCK_PIN);
+		// Slaves
+		for(uint8_t i=0, i < SPI_2_CONNECTED_SLAVES; i++){
+			gpio_set_mode(spi_module_2.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_2.connected_slaves[i].pin);
+		}
+		spi_init_master(spi_module_2.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
+				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+		spi_disable_crc(spi_module_2.spi_hardware)
+		spi_enable_rx_buffer_not_empty_interrupt(spi_module_2.spi_hardware);
+		spi_enable_software_slave_management(spi_module_2.spi_hardware);
+		spi_module_2.status |= SPI_MASTER;
+		spi_enable(spi_module_2.spi_hardware);
+	}
+	else{
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_2_MISO_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_MISO_PIN);
@@ -423,9 +390,31 @@ void init_spi(uint8_t mode){
 		spi_send_msb_first(spi_module_2.spi_hardware);
 		spi_disable_software_slave_management(spi_module_2.spi_hardware);
 		spi_enable(spi_module_2.spi_hardware);
-		#endif
+	}
+	#endif
 
-		#ifdef SPI_MODULE_3
+	#ifdef SPI_MODULE_3
+	if(mode3 == SPI_MASTER){
+		// Configuring the Hardware Interface
+		// MISO
+		gpio_set_mode(SPI_3_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_3_MISO_PIN);
+		// MOSI
+		gpio_set_mode(SPI_3_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_3_MOSI_PIN);
+		// SCK
+		gpio_set_mode(SPI_3_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_3_SCK_PIN);
+		// Slaves
+		for(uint8_t i=0, i < SPI_0_CONNECTED_SLAVES; i++){
+			gpio_set_mode(spi_module_3.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_3.connected_slaves[i].pin);
+		}
+		spi_init_master(spi_module_3.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
+				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+		spi_disable_crc(spi_module_3.spi_hardware)
+		spi_enable_rx_buffer_not_empty_interrupt(spi_module_3.spi_hardware);
+		spi_enable_software_slave_management(spi_module_3.spi_hardware);
+		spi_module_3.status |= SPI_MASTER;
+		spi_enable(spi_module_3.spi_hardware);
+	}
+	else{
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_3_MISO_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_MISO_PIN);
@@ -443,9 +432,31 @@ void init_spi(uint8_t mode){
 		spi_send_msb_first(spi_module_3.spi_hardware);
 		spi_disable_software_slave_management(spi_module_3.spi_hardware);
 		spi_enable(spi_module_3.spi_hardware);
-		#endif
+	}
+	#endif
 
-		#ifdef SPI_MODULE_4
+	#ifdef SPI_MODULE_4
+	if(mode4 == SPI_MASTER){
+		// Configuring the Hardware Interface
+		// MISO
+		gpio_set_mode(SPI_4_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_4_MISO_PIN);
+		// MOSI
+		gpio_set_mode(SPI_4_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_4_MOSI_PIN);
+		// SCK
+		gpio_set_mode(SPI_4_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_4_SCK_PIN);
+		// Slaves
+		for(uint8_t i=0, i < SPI_4_CONNECTED_SLAVES; i++){
+			gpio_set_mode(spi_module_4.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_4.connected_slaves[i].pin);
+		}
+		spi_init_master(spi_module_4.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
+				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+		spi_disable_crc(spi_module_4.spi_hardware)
+		spi_enable_rx_buffer_not_empty_interrupt(spi_module_4.spi_hardware);
+		spi_enable_software_slave_management(spi_module_4.spi_hardware);
+		spi_module_4.status |= SPI_MASTER;
+		spi_enable(spi_module_4.spi_hardware);
+	}
+	else{
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_4_MISO_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_4_MISO_PIN);
@@ -463,9 +474,31 @@ void init_spi(uint8_t mode){
 		spi_send_msb_first(spi_module_4.spi_hardware);
 		spi_disable_software_slave_management(spi_module_4.spi_hardware);
 		spi_enable(spi_module_4.spi_hardware);
-		#endif
+	}
+	#endif
 
-		#ifdef SPI_MODULE_5
+	#ifdef SPI_MODULE_5
+	if(mode5 == SPI_MASTER){
+		// Configuring the Hardware Interface
+		// MISO
+		gpio_set_mode(SPI_5_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_5_MISO_PIN);
+		// MOSI
+		gpio_set_mode(SPI_5_MOSI_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_5_MOSI_PIN);
+		// SCK
+		gpio_set_mode(SPI_5_SCK_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_5_SCK_PIN);
+		// Slaves
+		for(uint8_t i=0, i < SPI_5_CONNECTED_SLAVES; i++){
+			gpio_set_mode(spi_module_5.connected_slaves[i].port, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_5.connected_slaves[i].pin);
+		}
+		spi_init_master(spi_module_5.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE
+				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+		spi_disable_crc(spi_module_5.spi_hardware)
+		spi_enable_rx_buffer_not_empty_interrupt(spi_module_5.spi_hardware);
+		spi_enable_software_slave_management(spi_module_5.spi_hardware);
+		spi_module_5.status |= SPI_MASTER;
+		spi_enable(spi_module_5.spi_hardware);
+	}
+	else{
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_5_MISO_PORT, GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_5_MISO_PIN);
@@ -483,8 +516,8 @@ void init_spi(uint8_t mode){
 		spi_send_msb_first(spi_module_5.spi_hardware);
 		spi_disable_software_slave_management(spi_module_5.spi_hardware);
 		spi_enable(spi_module_5.spi_hardware);
-		#endif
 	}
+	#endif
 }
 
 // helper funktions -----------------------------------------------------------
@@ -514,6 +547,13 @@ uint8_t  write_spi_packet(struct spi *spimodule, uint8_t *data, uint8_t size){
 		spimodule->txbuffer.tail->writeindex = 0;
 		spimodule->txbuffer.tail->readindex = 0;
 		increment_bufferpointer(spimodule->txbuffer.tail, &spimodule->txbuffer);
+	}
+	if(spimodule->status & (SPIBUFFER_EMPTY|SPI_MASTER)){
+		spi_write(spimodule->spi_hardware, spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]);
+		spimodule->txbuffer.tail->readindex++;
+		if(spimodule->txbuffer.tail->readindex < spimodule->txbuffer.tail->writeindex){
+			spimodule->status &= ~SPIBUFFER_EMPTY;
+		}
 	}
 	spi_enable_rx_buffer_not_empty_interrupt(spimodule->spi_hardware);
 	return returnbyte;
