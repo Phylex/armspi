@@ -15,13 +15,11 @@ SIZE		= $(CROSS_PREFIX)size
 
 CFLAGS		= -Wall -Wextra -std=gnu99 -I../libopencm3/include -I ../common -$(TARGET) -mcpu=cortex-m3 -mthumb -fno-common -ffreestanding -Og -g
 LDSCRIPT	?= $(BINARY).ld
-LDFLAGS		= -lopencm3_stm32f1 -L../libopencm3/lib -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections
+LDFLAGS		= -lopencm3_stm32f1 -L../libopencm3/lib -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections -flto -T $(LDSCRIPT)
 OBJ		= $(BINARY).o
 
 
 all: $(BINARY).bin
-
-include $(TOOLCHAIN_DIR)/ld/Makefile.linker
 
 $(BINARY).elf: $(OBJ)
 	$(CC) -o armspi.elf $^ $(LDFLAGS)

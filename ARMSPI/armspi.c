@@ -228,15 +228,15 @@ volatile struct spi spi_module_4 = {
 #ifdef SPI_MODULE_5
 volatile struct spi spi_module_5 = {
 	.txbuffer = {
-		.start = &spi_module_5.tbuffer,
-		.head =  &spi_module_5.tbuffer,
-		.tail =  &spi_module_5.tbuffer,
+		.start = spi_module_5.tbuffer,
+		.head =  spi_module_5.tbuffer,
+		.tail =  spi_module_5.tbuffer,
 		.buffersize = TRANSMITBUFFERLENGTH,
 	},
 	.rxbuffer = {
-		.start = &spi_module_5.rbuffer,
-		.head = &spi_module_5.rbuffer,
-		.tail = &spi_module_5.rbuffer,
+		.start = spi_module_5.rbuffer,
+		.head = spi_module_5.rbuffer,
+		.tail = spi_module_5.rbuffer,
 		.buffersize = RECIEVEBUFFERLENGHT,
 	},
 	.spi_hardware = SPI6,
@@ -330,7 +330,7 @@ void init_spi(void){
 	#endif
 
 	#ifdef SPI_MODULE_2
-	if(spi_module_2.status == SPI_MASTER){
+	if(spi_module_2.status & SPI_MASTER){
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_2_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_2_MISO_PIN);
@@ -371,7 +371,7 @@ void init_spi(void){
 	#endif
 
 	#ifdef SPI_MODULE_3
-	if(spi_module_3.status == SPI_MASTER){
+	if(spi_module_3.status & SPI_MASTER){
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_3_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_3_MISO_PIN);
@@ -412,7 +412,7 @@ void init_spi(void){
 	#endif
 
 	#ifdef SPI_MODULE_4
-	if(spi_module_4.status == SPI_MASTER){
+	if(spi_module_4.status & SPI_MASTER){
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_4_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_4_MISO_PIN);
@@ -512,7 +512,7 @@ void increment_bufferpointer(volatile struct packet *pointer, volatile struct ri
 // end helper functions -------------------------------------------------------
 uint8_t  write_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t size){
 	spi_disable_rx_buffer_not_empty_interrupt(spimodule->spi_hardware);
-	for(spimodule->txbuffer.head->writeindex = 0;spimodule->txbuffer.head->writeindex < PACKETLENGTH && spimodule->txbuffer.head->writeindex < size; spimodule->txbuffer.head->writeindex++){
+	for(spimodule->txbuffer.head->writeindex = 0; spimodule->txbuffer.head->writeindex <= PACKETLENGTH && spimodule->txbuffer.head->writeindex <= size; spimodule->txbuffer.head->writeindex++){
 		spimodule->txbuffer.head->contents[spimodule->txbuffer.head->writeindex] = *(data + spimodule->txbuffer.head->writeindex);
 	}
 	uint8_t returnbyte = spimodule->txbuffer.head->writeindex;
@@ -540,7 +540,7 @@ uint8_t read_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t s
 		return 0;
 	}
 	for(i = 0; i < spimodule->rxbuffer.tail->writeindex && i < size; i++){
-		*data = spimodule->rxbuffer.tail->contents[i];
+		*(data + i) = spimodule->rxbuffer.tail->contents[i];
 	}
 	spimodule->rxbuffer.tail->writeindex = 0;
 	spimodule->rxbuffer.tail->readindex = 0;
