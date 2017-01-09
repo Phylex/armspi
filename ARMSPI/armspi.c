@@ -510,6 +510,7 @@ void increment_bufferpointer(volatile struct packet *pointer, volatile struct ri
 	}
 }
 // end helper functions -------------------------------------------------------
+// TODO add the facility of sending each packet to the corresponding Slave.
 uint8_t  write_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t size){
 	spi_disable_rx_buffer_not_empty_interrupt(spimodule->spi_hardware);
 	for(spimodule->txbuffer.head->writeindex = 0; spimodule->txbuffer.head->writeindex <= PACKETLENGTH && spimodule->txbuffer.head->writeindex <= size; spimodule->txbuffer.head->writeindex++){
