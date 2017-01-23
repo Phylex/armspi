@@ -1,4 +1,4 @@
-LIBRARY		= armspi
+LIBRARY		= libarmspi
 
 TOOLCHAIN_DIR	= ../libopencm3
 
