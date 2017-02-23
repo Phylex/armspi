@@ -155,6 +155,7 @@ struct spi {
 	const struct hardware_pin *connected_slaves;
 };
 
+
 void init_spi(void);
 uint8_t write_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t size);
 uint8_t read_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t size);
