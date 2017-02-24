@@ -503,8 +503,8 @@ void set_SS_pin_low(struct hardware_pin *ssline){
 	gpio_clear(ssline->port, ssline->pin);
 }
 
-void increment_bufferpointer(volatile struct packet **cursor, volatile struct ringbuffer *buffer){
-	*cursor ++;
+void increment_bufferpointer(volatile struct packet * volatile*cursor, volatile struct ringbuffer *buffer){
+	(*cursor) ++;
 	if(*cursor >= buffer->start+buffer->buffersize){
 		*cursor = buffer->start;
 	}
@@ -517,11 +517,11 @@ uint8_t  write_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t
 		spimodule->txbuffer.head->contents[spimodule->txbuffer.head->writeindex] = *(data + spimodule->txbuffer.head->writeindex);
 	}
 	uint8_t returnbyte = spimodule->txbuffer.head->writeindex;
-	increment_bufferpointer(&spimodule->txbuffer.head, &spimodule->txbuffer);
+	increment_bufferpointer(&(spimodule->txbuffer.head), &(spimodule->txbuffer));
 	if(spimodule->txbuffer.head == spimodule->txbuffer.tail){
 		spimodule->txbuffer.tail->writeindex = 0;
 		spimodule->txbuffer.tail->readindex = 0;
-		increment_bufferpointer(spimodule->txbuffer.tail, &spimodule->txbuffer);
+		increment_bufferpointer(&(spimodule->txbuffer.tail), &(spimodule->txbuffer));
 	}
 	if(spimodule->status & (SPIBUFFER_EMPTY|SPI_MASTER)){
 		spi_write(spimodule->spi_hardware, spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]);
@@ -545,7 +545,7 @@ uint8_t read_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t s
 	}
 	spimodule->rxbuffer.tail->writeindex = 0;
 	spimodule->rxbuffer.tail->readindex = 0;
-	increment_bufferpointer(spimodule->rxbuffer.tail, &spimodule->rxbuffer);
+	increment_bufferpointer(&(spimodule->rxbuffer.tail), &(spimodule->rxbuffer));
 	spi_enable_rx_buffer_not_empty_interrupt(spimodule->spi_hardware);
 	return i;
 }
@@ -569,12 +569,12 @@ void spi_irq_master_handler(volatile struct spi *spimodule){
 	}
 	else{
 		set_SS_pin_high(spimodule->txbuffer.head->slave);
-		increment_bufferpointer(spimodule->rxbuffer.head, &(spimodule->rxbuffer));
-		increment_bufferpointer(spimodule->txbuffer.tail, &(spimodule->txbuffer));
+		increment_bufferpointer(&(spimodule->rxbuffer.head), &(spimodule->rxbuffer));
+		increment_bufferpointer(&(spimodule->txbuffer.tail), &(spimodule->txbuffer));
 		if(spimodule->rxbuffer.head == spimodule->rxbuffer.tail){
 			spimodule->rxbuffer.tail->writeindex = 0;
 			spimodule->rxbuffer.tail->readindex = 0;
-			increment_bufferpointer(spimodule->rxbuffer.tail, &(spimodule->rxbuffer));
+			increment_bufferpointer(&(spimodule->rxbuffer.tail), &(spimodule->rxbuffer));
 			spimodule->rxbuffer.tail->writeindex = 0;
 			spimodule->rxbuffer.tail->readindex = 0;
 		}
@@ -604,7 +604,7 @@ void spi_irq_slave_handler(volatile struct spi *spimodule){
 	if(spimodule->status & SPI_PACKET_RECIEVED){
 		spimodule->txbuffer.tail->writeindex = 0;
 		spimodule->txbuffer.tail->readindex = 0;
-		increment_bufferpointer(spimodule->txbuffer.tail, &(spimodule->txbuffer));
+		increment_bufferpointer(&(spimodule->txbuffer.tail), &(spimodule->txbuffer));
 		if(spimodule->txbuffer.tail == spimodule->txbuffer.head){
 			spi_write(spimodule->spi_hardware, 0);
 		}
@@ -612,11 +612,11 @@ void spi_irq_slave_handler(volatile struct spi *spimodule){
 			spi_write(spimodule->spi_hardware, spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]);
 			spimodule->txbuffer.tail->readindex++;
 		}
-		increment_bufferpointer(spimodule->rxbuffer.head, &(spimodule->rxbuffer));
+		increment_bufferpointer(&(spimodule->rxbuffer.head), &(spimodule->rxbuffer));
 		if(spimodule->rxbuffer.head == spimodule->rxbuffer.tail){
 			spimodule->rxbuffer.head->writeindex = 0;
 			spimodule->rxbuffer.head->readindex = 0;
-			increment_bufferpointer(spimodule->rxbuffer.tail, &(spimodule->rxbuffer));
+			increment_bufferpointer(&(spimodule->rxbuffer.tail), &(spimodule->rxbuffer));
 		}
 	}
 	else{
