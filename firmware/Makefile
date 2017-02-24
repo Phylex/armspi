@@ -13,7 +13,7 @@ CC		= $(CROSS_PREFIX)gcc
 OBJCOPY		= $(CROSS_PREFIX)objcopy
 SIZE		= $(CROSS_PREFIX)size
 
-CFLAGS		= -Wall -Wextra -std=gnu99 -I../libopencm3/include -I../lib -I ../common -D$(TARGET) -mcpu=cortex-m3 -mthumb -fno-common -ffreestanding -Og -g
+CFLAGS		= -Wall -Wextra -std=gnu99 -I../libopencm3/include -I../lib -I ../common -D$(TARGET) -mcpu=cortex-m3 -mthumb -fno-common -ffreestanding -Og -o 0 -g
 LDSCRIPT	?= $(BINARY).ld
 LDFLAGS		= -lopencm3_stm32f1 -L../libopencm3/lib  -mthumb -mcpu=cortex-m3 -nostartfiles -Wl,--gc-sections -flto -T $(LDSCRIPT)
 OBJ		= $(BINARY).o armspi.o
