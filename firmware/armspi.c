@@ -13,27 +13,9 @@ struct hardware_pin {
 	uint32_t pin;
 };
 
-#ifdef SPI_MODULE_0
-static const struct hardware_pin connected_slaves_0[] =	{
-	{.port = SPI_0_SLAVE_0_PORT, .pin = SPI_0_SLAVE_0_PIN}
-#ifdef SPI_0_SLAVE_1_PORT
-	{.port = SPI_0_SLAVE_1_PORT, .pin = SPI_0_SLAVE_1_PIN}
-#endif
-#ifdef SPI_0_SLAVE_2_PORT
-	{.port = SPI_0_SLAVE_2_PORT, .pin = SPI_0_SLAVE_2_PIN}
-#endif
-#ifdef SPI_0_SLAVE_3_PORT
-	{.port = SPI_0_SLAVE_3_PORT, .pin = SPI_0_SLAVE_3_PIN}
-#endif
-#ifdef SPI_0_SLAVE_4_PORT
-	{.port = SPI_0_SLAVE_4_PORT, .pin = SPI_0_SLAVE_4_PIN}
-#endif
-};
-#endif
-
 #ifdef SPI_MODULE_1
 static const struct hardware_pin connected_slaves_1[] =	{
-	{.port = SPI_1_SLAVE_0_PORT, .pin = SPI_0_SLAVE_0_PIN}
+	{.port = SPI_1_SLAVE_0_PORT, .pin = SPI_1_SLAVE_0_PIN}
 #ifdef SPI_1_SLAVE_1_PORT
 	{.port = SPI_1_SLAVE_1_PORT, .pin = SPI_1_SLAVE_1_PIN}
 #endif
@@ -87,18 +69,18 @@ static const struct hardware_pin connected_slaves_3[] =	{
 
 #ifdef SPI_MODULE_4
 static const struct hardware_pin connected_slaves_4[] =	{
-	{.port = SPI_4_SLAVE_0_PORT, .pin = SPI_4_SLAVE_0_PIN},
+	{.port = SPI_4_SLAVE_0_PORT, .pin = SPI_4_SLAVE_0_PIN}
 #ifdef SPI_4_SLAVE_1_PORT
-	{.port = SPI_4_SLAVE_1_PORT, .pin = SPI_4_SLAVE_1_PIN},
+	{.port = SPI_4_SLAVE_1_PORT, .pin = SPI_4_SLAVE_1_PIN}
 #endif
 #ifdef SPI_4_SLAVE_2_PORT
-	{.port = SPI_4_SLAVE_2_PORT, .pin = SPI_4_SLAVE_2_PIN},
+	{.port = SPI_4_SLAVE_2_PORT, .pin = SPI_4_SLAVE_2_PIN}
 #endif
 #ifdef SPI_4_SLAVE_3_PORT
-	{.port = SPI_4_SLAVE_3_PORT, .pin = SPI_4_SLAVE_3_PIN},
+	{.port = SPI_4_SLAVE_3_PORT, .pin = SPI_4_SLAVE_3_PIN}
 #endif
 #ifdef SPI_4_SLAVE_4_PORT
-	{.port = SPI_4_SLAVE_4_PORT, .pin = SPI_4_SLAVE_4_PIN},
+	{.port = SPI_4_SLAVE_4_PORT, .pin = SPI_4_SLAVE_4_PIN}
 #endif
 };
 #endif
@@ -121,28 +103,26 @@ static const struct hardware_pin connected_slaves_5[] =	{
 };
 #endif
 
-// if the module is activated the space for the buffers is allocated
-// and initialize the data structures
-
-#ifdef SPI_MODULE_0
-volatile struct spi spi_module_0 = {
-	.txbuffer = {
-		.start = spi_module_0.tbuffer,
-		.head =  spi_module_0.tbuffer,
-		.tail =  spi_module_0.tbuffer,
-		.buffersize = TRANSMITBUFFERLENGTH,
-	},
-	.rxbuffer = {
-		.start = spi_module_0.rbuffer,
-		.head = spi_module_0.rbuffer,
-		.tail = spi_module_0.rbuffer,
-		.buffersize = RECIEVEBUFFERLENGHT,
-	},
-	.spi_hardware = SPI1,
-	.connected_slaves = connected_slaves_0,
-	.status = 0 | SPI_0_MODE,
+#ifdef SPI_MODULE_6
+static const struct hardware_pin connected_slaves_6[] =	{
+	{.port = SPI_6_SLAVE_0_PORT, .pin = SPI_6_SLAVE_0_PIN},
+#ifdef SPI_6_SLAVE_1_PORT
+	{.port = SPI_6_SLAVE_1_PORT, .pin = SPI_6_SLAVE_1_PIN},
+#endif
+#ifdef SPI_6_SLAVE_2_PORT
+	{.port = SPI_6_SLAVE_2_PORT, .pin = SPI_6_SLAVE_2_PIN},
+#endif
+#ifdef SPI_6_SLAVE_3_PORT
+	{.port = SPI_6_SLAVE_3_PORT, .pin = SPI_6_SLAVE_3_PIN},
+#endif
+#ifdef SPI_6_SLAVE_4_PORT
+	{.port = SPI_6_SLAVE_4_PORT, .pin = SPI_6_SLAVE_4_PIN},
+#endif
 };
 #endif
+
+// if the module is activated the space for the buffers is allocated
+// and initialize the data structures
 
 #ifdef SPI_MODULE_1
 volatile struct spi spi_module_1 = {
@@ -158,7 +138,7 @@ volatile struct spi spi_module_1 = {
 		.tail = spi_module_1.rbuffer,
 		.buffersize = RECIEVEBUFFERLENGHT,
 	},
-	.spi_hardware = SPI2,
+	.spi_hardware = SPI1,
 	.connected_slaves = connected_slaves_1,
 	.status = 0 | SPI_1_MODE,
 };
@@ -178,14 +158,13 @@ volatile struct spi spi_module_2 = {
 		.tail = spi_module_2.rbuffer,
 		.buffersize = RECIEVEBUFFERLENGHT,
 	},
-	.spi_hardware = SPI3,
+	.spi_hardware = SPI2,
 	.connected_slaves = connected_slaves_2,
 	.status = 0 | SPI_2_MODE,
 };
 #endif
 
 #ifdef SPI_MODULE_3
-// transmit buffer initialization
 volatile struct spi spi_module_3 = {
 	.txbuffer = {
 		.start = spi_module_3.tbuffer,
@@ -199,13 +178,14 @@ volatile struct spi spi_module_3 = {
 		.tail = spi_module_3.rbuffer,
 		.buffersize = RECIEVEBUFFERLENGHT,
 	},
-	.spi_hardware = SPI4,
+	.spi_hardware = SPI3,
 	.connected_slaves = connected_slaves_3,
 	.status = 0 | SPI_3_MODE,
 };
 #endif
 
 #ifdef SPI_MODULE_4
+// transmit buffer initialization
 volatile struct spi spi_module_4 = {
 	.txbuffer = {
 		.start = spi_module_4.tbuffer,
@@ -219,7 +199,7 @@ volatile struct spi spi_module_4 = {
 		.tail = spi_module_4.rbuffer,
 		.buffersize = RECIEVEBUFFERLENGHT,
 	},
-	.spi_hardware = SPI5,
+	.spi_hardware = SPI4,
 	.connected_slaves = connected_slaves_4,
 	.status = 0 | SPI_4_MODE,
 };
@@ -239,55 +219,33 @@ volatile struct spi spi_module_5 = {
 		.tail = spi_module_5.rbuffer,
 		.buffersize = RECIEVEBUFFERLENGHT,
 	},
-	.spi_hardware = SPI6,
+	.spi_hardware = SPI5,
 	.connected_slaves = connected_slaves_5,
 	.status = 0 | SPI_5_MODE,
 };
 #endif
 
-void init_spi(void){
-	#ifdef SPI_MODULE_0
-	if(spi_module_0.status & SPI_MASTER){
-		// Configuring the Hardware Interface
-		// MISO
-		gpio_set_mode(SPI_0_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_0_MISO_PIN);
-		// MOSI
-		gpio_set_mode(SPI_0_MOSI_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_0_MOSI_PIN);
-		// SCK
-		gpio_set_mode(SPI_0_SCK_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_0_SCK_PIN);
-		// Slaves
-		for(uint8_t i = 0; i < SPI_0_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_0.connected_slaves[i].port, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_0.connected_slaves[i].pin);
-		}
-		// Hardware modules
-		spi_init_master(spi_module_0.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-		spi_disable_crc(spi_module_0.spi_hardware);
-		spi_enable_rx_buffer_not_empty_interrupt(spi_module_0.spi_hardware);
-		spi_enable_software_slave_management(spi_module_0.spi_hardware);
-		spi_enable(spi_module_0.spi_hardware);
-	}
-	else{
-		// Configuring the Hardware Interface
-		// MISO
-		gpio_set_mode(SPI_0_MISO_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_0_MISO_PIN);
-		// MOSI
-		gpio_set_mode(SPI_0_MOSI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_0_MOSI_PIN);
-		// SCK
-		gpio_set_mode(SPI_0_SCK_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_0_SCK_PIN);
-		// the SS-input line
-		gpio_set_mode(spi_module_0.connected_slaves[0].port, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, spi_module_0.connected_slaves[0].pin);
-		// now configurer the SPI_module
-		spi_set_slave_mode(spi_module_0.spi_hardware);
-		spi_set_dff_8bit(spi_module_0.spi_hardware);
-		spi_set_clock_polarity_0(spi_module_0.spi_hardware);
-		spi_set_clock_phase_1(spi_module_0.spi_hardware);
-		spi_send_msb_first(spi_module_0.spi_hardware);
-		spi_disable_software_slave_management(spi_module_0.spi_hardware);
-		spi_enable(spi_module_0.spi_hardware);
-	}
-	#endif
+#ifdef SPI_MODULE_6
+volatile struct spi spi_module_6 = {
+	.txbuffer = {
+		.start = spi_module_6.tbuffer,
+		.head =  spi_module_6.tbuffer,
+		.tail =  spi_module_6.tbuffer,
+		.buffersize = TRANSMITBUFFERLENGTH,
+	},
+	.rxbuffer = {
+		.start = spi_module_6.rbuffer,
+		.head = spi_module_6.rbuffer,
+		.tail = spi_module_6.rbuffer,
+		.buffersize = RECIEVEBUFFERLENGHT,
+	},
+	.spi_hardware = SPI6,
+	.connected_slaves = connected_slaves_6,
+	.status = 0 | SPI_6_MODE,
+};
+#endif
 
+void init_spi(void){
 	#ifdef SPI_MODULE_1
 	if(spi_module_1.status & SPI_MASTER){
 		// Configuring the Hardware Interface
@@ -298,9 +256,10 @@ void init_spi(void){
 		// SCK
 		gpio_set_mode(SPI_1_SCK_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_1_SCK_PIN);
 		// Slaves
-		for(uint8_t i=0; i < SPI_1_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_0.connected_slaves[i].port, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_1.connected_slaves[i].pin);
+		for(uint8_t i = 0; i < SPI_1_CONNECTED_SLAVES; i++){
+			gpio_set_mode(spi_module_1.connected_slaves[i].port, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_1.connected_slaves[i].pin);
 		}
+		// Hardware modules
 		spi_init_master(spi_module_1.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
 				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
 		spi_disable_crc(spi_module_1.spi_hardware);
@@ -340,7 +299,7 @@ void init_spi(void){
 		gpio_set_mode(SPI_2_SCK_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_SCK_PIN);
 		// Slaves
 		for(uint8_t i=0; i < SPI_2_CONNECTED_SLAVES; i++){
-			gpio_set_mode(spi_module_2.connected_slaves[i].port, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_2.connected_slaves[i].pin);
+			gpio_set_mode(spi_module_1.connected_slaves[i].port, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_2.connected_slaves[i].pin);
 		}
 		spi_init_master(spi_module_2.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
 				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
@@ -380,7 +339,7 @@ void init_spi(void){
 		// SCK
 		gpio_set_mode(SPI_3_SCK_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_3_SCK_PIN);
 		// Slaves
-		for(uint8_t i=0; i < SPI_0_CONNECTED_SLAVES; i++){
+		for(uint8_t i=0; i < SPI_3_CONNECTED_SLAVES; i++){
 			gpio_set_mode(spi_module_3.connected_slaves[i].port, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_3.connected_slaves[i].pin);
 		}
 		spi_init_master(spi_module_3.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
@@ -393,11 +352,11 @@ void init_spi(void){
 	else{
 		// Configuring the Hardware Interface
 		// MISO
-		gpio_set_mode(SPI_3_MISO_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_2_MISO_PIN);
+		gpio_set_mode(SPI_3_MISO_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_3_MISO_PIN);
 		// MOSI
-		gpio_set_mode(SPI_3_MOSI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_2_MOSI_PIN);
+		gpio_set_mode(SPI_3_MOSI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_3_MOSI_PIN);
 		// SCK
-		gpio_set_mode(SPI_3_SCK_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_2_SCK_PIN);
+		gpio_set_mode(SPI_3_SCK_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_3_SCK_PIN);
 		// the SS-input line
 		gpio_set_mode(spi_module_3.connected_slaves[0].port, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, spi_module_3.connected_slaves[0].pin);
 		// now configurer the SPI_module
@@ -435,7 +394,7 @@ void init_spi(void){
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_4_MISO_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_4_MISO_PIN);
-		// MOS4
+		// MOSI
 		gpio_set_mode(SPI_4_MOSI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_4_MOSI_PIN);
 		// SCK
 		gpio_set_mode(SPI_4_SCK_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_4_SCK_PIN);
@@ -453,7 +412,7 @@ void init_spi(void){
 	#endif
 
 	#ifdef SPI_MODULE_5
-	if(spi_module_5.status == SPI_MASTER){
+	if(spi_module_5.status & SPI_MASTER){
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_5_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_5_MISO_PIN);
@@ -467,7 +426,7 @@ void init_spi(void){
 		}
 		spi_init_master(spi_module_5.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
 				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-		spi_disable_crc(spi_module_5.spi_hardware)
+		spi_disable_crc(spi_module_5.spi_hardware);
 		spi_enable_rx_buffer_not_empty_interrupt(spi_module_5.spi_hardware);
 		spi_enable_software_slave_management(spi_module_5.spi_hardware);
 		spi_enable(spi_module_5.spi_hardware);
@@ -476,7 +435,7 @@ void init_spi(void){
 		// Configuring the Hardware Interface
 		// MISO
 		gpio_set_mode(SPI_5_MISO_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_5_MISO_PIN);
-		// MOSI
+		// MOS4
 		gpio_set_mode(SPI_5_MOSI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_5_MOSI_PIN);
 		// SCK
 		gpio_set_mode(SPI_5_SCK_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_5_SCK_PIN);
@@ -490,6 +449,47 @@ void init_spi(void){
 		spi_send_msb_first(spi_module_5.spi_hardware);
 		spi_disable_software_slave_management(spi_module_5.spi_hardware);
 		spi_enable(spi_module_5.spi_hardware);
+	}
+	#endif
+
+	#ifdef SPI_MODULE_6
+	if(spi_module_6.status == SPI_MASTER){
+		// Configuring the Hardware Interface
+		// MISO
+		gpio_set_mode(SPI_6_MISO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_6_MISO_PIN);
+		// MOSI
+		gpio_set_mode(SPI_6_MOSI_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_6_MOSI_PIN);
+		// SCK
+		gpio_set_mode(SPI_6_SCK_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_6_SCK_PIN);
+		// Slaves
+		for(uint8_t i=0; i < SPI_6_CONNECTED_SLAVES; i++){
+			gpio_set_mode(spi_module_6.connected_slaves[i].port, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, spi_module_6.connected_slaves[i].pin);
+		}
+		spi_init_master(spi_module_6.spi_hardware, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+				SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+		spi_disable_crc(spi_module_6.spi_hardware)
+		spi_enable_rx_buffer_not_empty_interrupt(spi_module_6.spi_hardware);
+		spi_enable_software_slave_management(spi_module_6.spi_hardware);
+		spi_enable(spi_module_6.spi_hardware);
+	}
+	else{
+		// Configuring the Hardware Interface
+		// MISO
+		gpio_set_mode(SPI_6_MISO_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SPI_6_MISO_PIN);
+		// MOSI
+		gpio_set_mode(SPI_6_MOSI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_6_MOSI_PIN);
+		// SCK
+		gpio_set_mode(SPI_6_SCK_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SPI_6_SCK_PIN);
+		// the SS-input line
+		gpio_set_mode(spi_module_6.connected_slaves[0].port, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, spi_module_6.connected_slaves[0].pin);
+		// now configurer the SPI_module
+		spi_set_slave_mode(spi_module_6.spi_hardware);
+		spi_set_dff_8bit(spi_module_6.spi_hardware);
+		spi_set_clock_polarity_0(spi_module_6.spi_hardware);
+		spi_set_clock_phase_1(spi_module_6.spi_hardware);
+		spi_send_msb_first(spi_module_6.spi_hardware);
+		spi_disable_software_slave_management(spi_module_6.spi_hardware);
+		spi_enable(spi_module_6.spi_hardware);
 	}
 	#endif
 }
@@ -636,19 +636,8 @@ void spi_irq_slave_handler(volatile struct spi *spimodule){
 	}
 }
 
-#ifdef SPI_MODULE_0
-void spi1_isr(void){
-	if(spi_module_0.status & SPI_MASTER){
-		spi_irq_master_handler(&spi_module_0);
-	}
-	else{
-		spi_irq_slave_handler(&spi_module_0);
-	}
-}
-#endif
-
 #ifdef SPI_MODULE_1
-void spi2_isr(void){
+void spi1_isr(void){
 	if(spi_module_1.status & SPI_MASTER){
 		spi_irq_master_handler(&spi_module_1);
 	}
@@ -659,7 +648,7 @@ void spi2_isr(void){
 #endif
 
 #ifdef SPI_MODULE_2
-void spi3_isr(void){
+void spi2_isr(void){
 	if(spi_module_2.status & SPI_MASTER){
 		spi_irq_master_handler(&spi_module_2);
 	}
@@ -670,7 +659,7 @@ void spi3_isr(void){
 #endif
 
 #ifdef SPI_MODULE_3
-void spi4_isr(void){
+void spi3_isr(void){
 	if(spi_module_3.status & SPI_MASTER){
 		spi_irq_master_handler(&spi_module_3);
 	}
@@ -681,7 +670,7 @@ void spi4_isr(void){
 #endif
 
 #ifdef SPI_MODULE_4
-void spi5_isr(void){
+void spi4_isr(void){
 	if(spi_module_4.status & SPI_MASTER){
 		spi_irq_master_handler(&spi_module_4);
 	}
@@ -692,12 +681,23 @@ void spi5_isr(void){
 #endif
 
 #ifdef SPI_MODULE_5
-void spi6_isr(void){
+void spi5_isr(void){
 	if(spi_module_5.status & SPI_MASTER){
 		spi_irq_master_handler(&spi_module_5);
 	}
 	else{
 		spi_irq_slave_handler(&spi_module_5);
+	}
+}
+#endif
+
+#ifdef SPI_MODULE_6
+void spi6_isr(void){
+	if(spi_module_6.status & SPI_MASTER){
+		spi_irq_master_handler(&spi_module_6);
+	}
+	else{
+		spi_irq_slave_handler(&spi_module_6);
 	}
 }
 #endif

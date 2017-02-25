@@ -2,7 +2,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include "armspi.h"
 
-extern struct spi spi_module_0;
+extern struct spi spi_module_1;
 
 void main(void)
 {
@@ -18,7 +18,7 @@ void main(void)
 	init_spi();
 	
 	while(1) {
-		write_spi_packet(&spi_module_0, data, 4);
+		write_spi_packet(&spi_module_1, data, 4);
 		gpio_toggle(GPIOC, GPIO13);
 		for(int i = 0; i < 800000; i++){
 			__asm__("nop");
