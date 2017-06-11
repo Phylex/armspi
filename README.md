@@ -60,6 +60,10 @@ The Library needs some information at compiletime:
     The Module name here corresponds to the hardware interface of the number (modulenumber +1).
     It includes the default pins for that device as defined in the libopencm3 for that device.
 
+##Usage
+The spimodules named spi_module_[0-5] must be declared as external variables as they are decared inside the armspi.c file.
+After that the fuctions of the module can be used as normal.
+
 ## The handling of Slaves
 This library is generally capable of handling multiple Slaves.
 Every module points to an array of hardware_pin structs, that are the SS-Pins that are driven.

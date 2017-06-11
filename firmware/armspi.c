@@ -706,6 +706,7 @@ void spi_irq_master_handler(volatile struct spi *spimodule){
 	spimodule->rxbuffer.head->contents[spimodule->rxbuffer.head->writeindex] = SPI_DR(spimodule->spi_hardware);
 	spimodule->rxbuffer.head->writeindex++;
 	if(spimodule->status & SPI_PACKET_BEING_SENT){
+		// We are in the middle of sending a packet so we continue to send it
 		spi_write(spimodule->spi_hardware, (uint16_t)(spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]));
 		spimodule->txbuffer.tail->readindex++;
 		if(spimodule->txbuffer.tail->readindex < spimodule->txbuffer.tail->writeindex){
@@ -719,6 +720,7 @@ void spi_irq_master_handler(volatile struct spi *spimodule){
 		}
 	}
 	else{
+		// We have to switch to the next packet (if one is in the buffer) and send it, for we have fully sent the last
 		set_SS_pin_high(spimodule->txbuffer.tail->slave);
 		increment_bufferpointer(&(spimodule->rxbuffer.head), &(spimodule->rxbuffer));
 		increment_bufferpointer(&(spimodule->txbuffer.tail), &(spimodule->txbuffer));
@@ -745,8 +747,10 @@ void spi_irq_master_handler(volatile struct spi *spimodule){
 
 void spi_irq_slave_handler(volatile struct spi *spimodule){
 	uint8_t tmprxdata = SPI_DR(spimodule->spi_hardware);
-	spimodule->status &= SPI_PACKET_RECIEVED;
+	spimodule->status &= ~SPI_PACKET_RECIEVED;
+	// Listen for the SS linte to go up if it does we have recieved a packet
 	for(uint8_t i=0; i>=MAXLOOP; i++){
+	// If the device is in slave mode it will always listen on the SS pin line
 		if(gpio_get(spimodule->connected_slaves[0].port, spimodule->connected_slaves[0].pin)){
 			spimodule->status |= SPI_PACKET_RECIEVED;
 			break;
@@ -756,12 +760,18 @@ void spi_irq_slave_handler(volatile struct spi *spimodule){
 		spimodule->txbuffer.tail->writeindex = 0;
 		spimodule->txbuffer.tail->readindex = 0;
 		increment_bufferpointer(&(spimodule->txbuffer.tail), &(spimodule->txbuffer));
+		// If the transmission buffer is empty send back 0s
 		if(spimodule->txbuffer.tail == spimodule->txbuffer.head){
 			spi_write(spimodule->spi_hardware, 0);
 		}
 		else{
 			spi_write(spimodule->spi_hardware, spimodule->txbuffer.tail->contents[spimodule->txbuffer.tail->readindex]);
 			spimodule->txbuffer.tail->readindex++;
+		}
+		// store the recieeved byte before incrementing to the next recieved packet
+		if(spimodule->rxbuffer.head->writeindex < PACKETLENGTH){
+			spimodule->rxbuffer.head->writeindex = tmprxdata;
+			spimodule->rxbuffer.head->writeindex++;
 		}
 		increment_bufferpointer(&(spimodule->rxbuffer.head), &(spimodule->rxbuffer));
 		if(spimodule->rxbuffer.head == spimodule->rxbuffer.tail){

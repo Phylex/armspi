@@ -185,26 +185,26 @@
 
 // TODO collect the RCC registers for the other SPI_Modules in bigger chips
 #define SPI_3_SLAVE_0_PORT GPIO_BANK_SPI3_NSS
-#define SPI_3_SLAVE_0_RCC 
+#define SPI_3_SLAVE_0_RCC
 #define SPI_3_SLAVE_0_PIN GPIO_SPI3_NSS
 //#define SPI_3_SLAVE_1_PORT
 //#define SPI_3_SLAVE_1_RCC
 //#define SPI_3_SLAVE_1_PIN
 
 #define SPI_4_SLAVE_0_PORT GPIO_BANK_SPI4_NSS
-#define SPI_4_SLAVE_0_RCC 
+#define SPI_4_SLAVE_0_RCC
 #define SPI_4_SLAVE_0_PIN GPIO_SPI4_NSS
 //#define SPI_3_SLAVE_0_PORT
 //#define SPI_3_SLAVE_0_PIN
 
 #define SPI_5_SLAVE_0_PORT GPIO_BANK_SPI5_NSS
-#define SPI_5_SLAVE_0_RCC 
+#define SPI_5_SLAVE_0_RCC
 #define SPI_5_SLAVE_0_PIN GPIO_SPI5_NSS
 //#define SPI_4_SLAVE_0_PORT
 //#define SPI_4_SLAVE_0_PIN
 
 #define SPI_6_SLAVE_0_PORT GPIO_BANK_SPI6_NSS
-#define SPI_6_SLAVE_0_RCC 
+#define SPI_6_SLAVE_0_RCC
 #define SPI_6_SLAVE_0_PIN GPIO_SPI6_NSS
 //#define SPI_5_SLAVE_0_PORT
 //#define SPI_5_SLAVE_0_PIN
@@ -299,7 +299,6 @@ struct spi {
 	uint32_t spi_hardware;
 	const struct hardware_pin *connected_slaves;
 };
-
 
 void init_spi(void);
 uint8_t write_spi_packet(volatile struct spi *spimodule, uint8_t *data, uint8_t size,uint8_t slave_nr);
